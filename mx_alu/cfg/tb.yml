@@ -1,0 +1,22 @@
+# Toplevel simulation module name
+sim.inputs.tb_name: "testbench"
+
+# Search directories for `include directives in simulations
+sim.inputs.tb_incdir: [
+  "${bsg_root}/bsg_misc"
+]
+sim.inputs.tb_incdir_meta: [subst]
+
+# Additional source files for simulations
+sim.inputs.tb_input_files: [
+  "v/mxfp8_pkg.v",
+  "v/mx_alu_wrapper.v",
+  "v/mx_alu.v",
+  "v/testbench.v"
+]
+sim.inputs.tb_input_files_meta: [subst]
+
+# Add synthesis input files to simulation inputs (only for RTL sim)
+sim.inputs.input_files: synthesis.inputs.input_files
+sim.inputs.input_files_meta: [crossref, subst]
+
