@@ -1,3 +1,0 @@
-Command Line: /home/projects/ee477.2023wtr/cad/synopsys/verdi/Q-2020.03-SP2-8/platform/LINUXAMD64/bin/Novas -full64 -ssf /home/ohlbur/ee477/ocp_mx_alu/mx_alu/build/sim-rtl-rundir/waveform.fsdb
-uname(Linux linux-lab-056.ece.uw.edu 3.10.0-1160.108.1.el7.x86_64 #1 SMP Thu Jan 25 16:17:31 UTC 2024 x86_64)
-au time 341.433831 12.324399 5.298385 delta 264572928 264572928 total 731205632 731205632
