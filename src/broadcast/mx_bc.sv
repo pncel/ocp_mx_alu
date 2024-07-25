@@ -9,11 +9,14 @@ import alu_core_pkg::*; #(
     output logic [LARGEST_VECTOR_SIZE-1:0] vector_out
 );
     logic [15:0] scalar_e8int8;
+    logic [15:0] fp32_to_bf16;
 
+    assign fp32_to_bf16 = fp32_RNE_bf16(scalar_in);
+    
     always_comb begin 
         case(scalar_datatype)
             BFLOAT16: scalar_e8int8 = bf16_RNE_int8(scalar_in[15:0]);
-            FLOAT32: scalar_e8int8 = bf16_RNE_int8(fp32_RNE_bf16(scalar_in));
+            FLOAT32: scalar_e8int8 = bf16_RNE_int8(fp32_to_bf16);
         endcase
     end
     //
