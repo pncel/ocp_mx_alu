@@ -1,6 +1,6 @@
 
-`ifndef ALU_CORE_PKG
-`define ALU_CORE_PKG
+`ifndef ALU_CORE_PKG__SV
+`define ALU_CORE_PKG__SV
 
 package alu_core_pkg;
     import alu_op_pkg::*;

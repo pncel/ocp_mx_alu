@@ -1,6 +1,6 @@
 
-`ifndef MX_FORMAT_PKG
-`define MX_FORMAT_PKG
+`ifndef MX_FORMAT_PKG__SV
+`define MX_FORMAT_PKG__SV
 
 package mx_format_pkg;
 
@@ -56,7 +56,7 @@ package mx_format_pkg;
     parameter MXINT8_ELEMENT_BITS = 8;
 
     // Used to parse the block scale
-    typedef logic signed [7:0] t_mx_scale_data;
+    typedef logic [7:0] t_mx_scale_data;
 
     parameter MX_SCALE_DATA_BITS = 8;
 
@@ -100,7 +100,7 @@ package mx_format_pkg;
     parameter MXFP4_VECTOR_SIZE = MX_SCALE_DATA_BITS + MXFP4_ELEMENT_BITS * SCALING_BLOCK_SIZE;
 
     // Used to parse the MXINT8 vector
-    typedef struct {
+    typedef struct packed {
         t_mx_scale_data scale;
         t_mxint8_element [SCALING_BLOCK_SIZE-1:0] elements;
     } t_mxint8_vector;

@@ -1,6 +1,6 @@
 
-`ifndef ALU_OP_PKG
-`define ALU_OP_PKG
+`ifndef ALU_OP_PKG__SV
+`define ALU_OP_PKG__SV
 
 package alu_op_pkg;
 
