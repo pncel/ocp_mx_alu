@@ -46,12 +46,7 @@ package mx_format_pkg;
     parameter MXFP4_ELEMENT_BITS = 4;
 
     // Used to parse INT8 elements
-    typedef struct packed {
-        // logic sign;
-        // logic [3:0] exponent;
-        // logic [6:0] mantissa;
-        logic signed [7:0] int8;
-    } t_mxint8_element;
+    typedef logic signed [7:0] t_mxint8_element;
 
     parameter MXINT8_ELEMENT_BITS = 8;
 

@@ -2,6 +2,8 @@
 `ifndef MX_FUNCTION_PKG
 `define MX_FUNCTION_PKG
 
+`include "mx_format_pkg.sv"
+
 package mx_function_pkg;
 
     import mx_format_pkg::*;
