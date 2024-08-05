@@ -1,0 +1,10 @@
+
+`ifndef MX_GENERAL_INCLUDES
+
+`define MX_GENERAL_INCLUDES
+
+parameter BLOCK_SIZE = 32;
+
+parameter SCALE_WIDTH = 8;
+
+`endif // MX_GENERAL_INCLUDES
