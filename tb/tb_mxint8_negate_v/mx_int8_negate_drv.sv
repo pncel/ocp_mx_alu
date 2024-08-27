@@ -7,7 +7,7 @@ module mx_int8_negate_drv(
     `include "scalar_includes.v"
     `include "mxint8_includes.v"
     input wire clk;
-    output wire [0:`BLOCK_SIZE-1][`MXINT8_ELEMENT_WIDTH-1:0] gen_mxint8_elements ;
+    output wire [`MXINT8_ELEMENT_WIDTH-1:0] gen_mxint8_elements[0:`BLOCK_SIZE-1] ;
     output wire data_ready_o; 
     t_mx_int8_vector data_in(.elements(gen_mxint8_elements));
     reg rand_ready;

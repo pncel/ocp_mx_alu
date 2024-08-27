@@ -3,8 +3,8 @@
 module tb_mxint8_negate; 
     `include "mxint8_negate.v"
     bit clk;
-    wire [0:`BLOCK_SIZE-1][`MXINT8_ELEMENT_WIDTH-1:0] dut_i_mxint8_elements;
-    wire [0:`BLOCK_SIZE-1][`MXINT8_ELEMENT_WIDTH-1:0] dut_o_mxint8_elements;
+    wire [`MXINT8_ELEMENT_WIDTH-1:0] dut_i_mxint8_elements[0:`BLOCK_SIZE-1];
+    wire [`MXINT8_ELEMENT_WIDTH-1:0] dut_o_mxint8_elements[0:`BLOCK_SIZE-1];
     wire data_ready;
    
     mxint8_negate uut (
