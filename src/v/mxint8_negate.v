@@ -1,3 +1,5 @@
+`ifndef  MXINT8_NEGATE__V
+`define  MXINT8_NEGATE__V
 
 module mxint8_negate (
     i_mxint8_elements,
@@ -17,3 +19,4 @@ module mxint8_negate (
     endgenerate
 
 endmodule
+`endif 
