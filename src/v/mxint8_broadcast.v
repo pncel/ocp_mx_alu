@@ -12,7 +12,7 @@ module mxint8_broadcast (
 
     input  wire [`FLOAT32_WIDTH-1:0]         i_float32;
     output reg  [`SCALE_WIDTH-1:0]           o_scale;
-    output reg  [`MXINT8_ELEMENT_WIDTH-1:0]  o_mxint8_elements [BLOCK_SIZE-1:0];
+    output reg  [`MXINT8_ELEMENT_WIDTH-1:0]  o_mxint8_elements [`BLOCK_SIZE-1:0];
 
     reg [`FLOAT32_MANTISSA_WIDTH-1:0] rounded_mantissa;
     reg [`FLOAT32_MANTISSA_WIDTH+1:0] extended_mantissa;

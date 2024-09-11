@@ -1940,7 +1940,7 @@ input binary:
 01111001
 10000111
 output binary
-zero element index:  4
+zero element index: 13
 
 transection id:          10
 element index:           0
@@ -1968,10 +1968,10 @@ input binary:
 11010010
 output binary
 element index:           4
-input data: 0.000000, output data: 0.000000
+input data: -1.812500, output data: 1.812500
 input binary: 
-00000000
-00000000
+10001100
+01110100
 output binary
 element index:           5
 input data: 1.765625, output data: -1.765625
@@ -2022,10 +2022,10 @@ input binary:
 01001011
 output binary
 element index:          13
-input data: -1.859375, output data: 1.859375
+input data: 0.000000, output data: 0.000000
 input binary: 
-10001001
-01110111
+00000000
+00000000
 output binary
 element index:          14
 input data: -1.765625, output data: 1.765625
@@ -2135,7 +2135,7 @@ input binary:
 01100101
 10011011
 output binary
-zero element index:  1
+zero element index: 13
 
 transection id:          11
 element index:           0
@@ -2145,10 +2145,10 @@ input binary:
 11111101
 output binary
 element index:           1
-input data: 0.000000, output data: 0.000000
+input data: -0.031250, output data: 0.031250
 input binary: 
-00000000
-00000000
+11111110
+00000010
 output binary
 element index:           2
 input data: -0.046875, output data: 0.046875
@@ -2217,10 +2217,10 @@ input binary:
 11001010
 output binary
 element index:          13
-input data: -0.203125, output data: 0.203125
+input data: 0.000000, output data: 0.000000
 input binary: 
-11110011
-00001101
+00000000
+00000000
 output binary
 element index:          14
 input data: -0.078125, output data: 0.078125
@@ -2330,7 +2330,7 @@ input binary:
 01100000
 10100000
 output binary
-zero element index:  9
+zero element index:  5
 
 transection id:          12
 element index:           0
@@ -2364,10 +2364,10 @@ input binary:
 11110010
 output binary
 element index:           5
-input data: -0.562500, output data: 0.562500
+input data: 0.000000, output data: 0.000000
 input binary: 
-11011100
-00100100
+00000000
+00000000
 output binary
 element index:           6
 input data: 0.750000, output data: -0.750000
@@ -2388,10 +2388,10 @@ input binary:
 00000000
 output binary
 element index:           9
-input data: 0.000000, output data: 0.000000
+input data: 1.046875, output data: -1.046875
 input binary: 
-00000000
-00000000
+01000011
+10111101
 output binary
 element index:          10
 input data: -0.125000, output data: 0.125000

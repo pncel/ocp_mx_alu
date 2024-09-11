@@ -35,10 +35,10 @@ module mx_int8_bd_ref (
     assign fp_m_high ={1'b0, fp32_m[`FLOAT32_MANTISSA_WIDTH:`FLOAT32_MANTISSA_WIDTH-(`MXINT8_ELEMENT_WIDTH-1)+1]};
     assign fp_m_low = fp32_m[`FLOAT32_MANTISSA_WIDTH-(`MXINT8_ELEMENT_WIDTH-1):0];
     always@(*) begin
-        carry = carry_logic(fp_m_high[0],larger,fp_m_low[`FLOAT32_MANTISSA_WIDTH-(`MXINT8_ELEMENT_WIDTH-1)]);
+        carry <= carry_logic(fp_m_high[0],larger,fp_m_low[`FLOAT32_MANTISSA_WIDTH-(`MXINT8_ELEMENT_WIDTH-1)]);
     end
     always@(*) begin
-        fp_round = carry + fp_m_high;
+        fp_round <= carry + fp_m_high;
     end
 
     wire overflow;
@@ -51,7 +51,7 @@ module mx_int8_bd_ref (
 
     reg [`MXINT8_ELEMENT_WIDTH-1:0]fp_round_signed;
     always@(*) begin
-        fp_round_signed = sign_conv(fp32_sign,fp_round_unsigned);
+        fp_round_signed <= sign_conv(fp32_sign,fp_round_unsigned);
     end
     genvar i;
     generate

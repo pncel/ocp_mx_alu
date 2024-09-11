@@ -7,6 +7,7 @@ $high_tb_dir=".."
 
 iverilog -g2012 -o $output_vvp `
     -I $design_dir `
+    "$design_dir/mxint8_broadcast.v" `
     "$high_tb_dir/transection.sv" `
     "$tb_dir/mx_int8_bd_mon.sv" `
     "$tb_dir/mx_int8_bd_drv.sv" `
