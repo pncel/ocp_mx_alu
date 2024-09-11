@@ -33,6 +33,8 @@ module tb_mxint8_bd;
     .i_float32(i_float32),
     .ref_o_scale(o_scale_ref),
     .ref_o_mxint8_elements(o_mxint8_elements_ref),
+    .dut_o_scale(o_scale_dut),
+    .dut_o_mxint8_elements(o_mxint8_elements_dut),
     .ref_o_overflow(o_overflow_ref),
     .clk(clk)
     );
