@@ -68,6 +68,9 @@ module t_fp32_scalar(output [`FLOAT32_WIDTH-1:0] f);
         set_clean();
         randomize();
     end
+    function void set_zero();
+        {mantissa_high,mantissa_low_msb,mantissa_low} = `FLOAT32_MANTISSA_WIDTH'd0;
+    endfunction
     function void set_clean();
         sign = 1'b0;
         sub_normal = 1'b0;

@@ -78,6 +78,7 @@ module mx_int8_bd_drv(
     endtask
     task NaN_drive();  
         data_in.set_NaN(1'b1);  
+        $display("NaN normal case"); 
         data_in.set_sign(1'b0);
         repeat(2) begin
             @(posedge clk) begin 
@@ -86,16 +87,30 @@ module mx_int8_bd_drv(
             end
             data_in.set_sign(1'b1); 
         end
-        $display("NaN carry");
+        $display("NaN carry case");
         carry_drive();
         data_in.set_NaN(1'b1);
-        $display("NaN overflow"); 
+        $display("NaN overflow case"); 
         overflow_drive();
+        $display("NaN zero case"); 
+        zero_drive();
         data_in.set_clean();
+    endtask
+    task zero_drive();  
+        data_in.set_sign(1'b0);
+        repeat(2) begin
+            @(posedge clk) begin 
+                data_in.randomize();
+                data_in.set_zero();
+                #1;
+            end
+            data_in.set_sign(1'b1); 
+        end
     endtask
     task sub_normal_drive();  
         data_in.set_clean();  
         data_in.sub_normal = 1'b1; 
+        $display("subnormal normal case"); 
         data_in.set_sign(1'b0);
         repeat(2) begin
             @(posedge clk) begin       
@@ -106,6 +121,7 @@ module mx_int8_bd_drv(
         end
         data_in.set_carry(1'b1); 
         data_in.set_sign(1'b0);
+        $display("subnormal carry case"); 
         repeat(2) begin
             @(posedge clk) begin 
                 data_in.sub_normal = 1'b1;
@@ -114,6 +130,8 @@ module mx_int8_bd_drv(
             end
             data_in.set_sign(1'b1); 
         end
+        $display("subnormal zero case"); 
+        zero_drive();
         data_in.set_clean();
     endtask
     initial begin
@@ -136,7 +154,10 @@ module mx_int8_bd_drv(
             NaN_drive();
         $display("subnormal case");
         repeat(3) 
-            sub_normal_drive();
+            sub_normal_drive(); //FP32 +0, -0. is in this case's zero drive case. 
+        $display("zero case");
+        repeat(5) 
+            zero_drive(); //this is FP32 mantissa zero cases
         $finish();
     end
 endmodule 
