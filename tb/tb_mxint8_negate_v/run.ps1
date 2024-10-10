@@ -12,5 +12,5 @@ iverilog -g2012 -o $output_vvp `
     "$tb_dir/mx_int8_negate_drv.sv" `
     "$tb_dir/tb_mxint8_negate.sv"
 
-#vvp -n $output_vvp > test.log
+vvp -n $output_vvp > test.log
 
