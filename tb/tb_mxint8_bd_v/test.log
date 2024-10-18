@@ -408,7 +408,7 @@ transection id:          44
 input binary: 
 11111111011111110110001001010110
 xxxxxxx11000000  :INT8 element mantissa output binary REF
-xxxxxxx10111111  :INT8 element mantissa output binary DUT
+xxxxxxx10000001  :INT8 element mantissa output binary DUT
 x11111111  :E8M0 shared scalar output binary REF
 x11111110  :E8M0 shared scalar output binary DUT
 ERROR elements not match
@@ -419,9 +419,10 @@ transection id:          45
 input binary: 
 01111111011111110000001101110011
 xxxxxxx01000000  :INT8 element mantissa output binary REF
-xxxxxxx01000000  :INT8 element mantissa output binary DUT
+xxxxxxx01111111  :INT8 element mantissa output binary DUT
 x11111111  :E8M0 shared scalar output binary REF
 x11111110  :E8M0 shared scalar output binary DUT
+ERROR elements not match
 ERROR scale not match
 1  :o_overflow output binary REF
 
@@ -429,7 +430,7 @@ transection id:          46
 input binary: 
 11111111011111110001001000111001
 xxxxxxx11000000  :INT8 element mantissa output binary REF
-xxxxxxx10111111  :INT8 element mantissa output binary DUT
+xxxxxxx10000001  :INT8 element mantissa output binary DUT
 x11111111  :E8M0 shared scalar output binary REF
 x11111110  :E8M0 shared scalar output binary DUT
 ERROR elements not match
@@ -440,9 +441,10 @@ transection id:          47
 input binary: 
 01111111011111110101110110000001
 xxxxxxx01000000  :INT8 element mantissa output binary REF
-xxxxxxx01000000  :INT8 element mantissa output binary DUT
+xxxxxxx01111111  :INT8 element mantissa output binary DUT
 x11111111  :E8M0 shared scalar output binary REF
 x11111110  :E8M0 shared scalar output binary DUT
+ERROR elements not match
 ERROR scale not match
 1  :o_overflow output binary REF
 
@@ -450,7 +452,7 @@ transection id:          48
 input binary: 
 11111111011111110110111000011111
 xxxxxxx11000000  :INT8 element mantissa output binary REF
-xxxxxxx10111111  :INT8 element mantissa output binary DUT
+xxxxxxx10000001  :INT8 element mantissa output binary DUT
 x11111111  :E8M0 shared scalar output binary REF
 x11111110  :E8M0 shared scalar output binary DUT
 ERROR elements not match
@@ -463,9 +465,10 @@ transection id:          49
 input binary: 
 01111111011111111001001100010100
 xxxxxxx01000000  :INT8 element mantissa output binary REF
-xxxxxxx01000000  :INT8 element mantissa output binary DUT
+xxxxxxx01111111  :INT8 element mantissa output binary DUT
 x11111111  :E8M0 shared scalar output binary REF
 x11111110  :E8M0 shared scalar output binary DUT
+ERROR elements not match
 ERROR scale not match
 1  :o_overflow output binary REF
 
