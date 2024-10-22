@@ -294,11 +294,11 @@ x00010111  -104.000000    :E8M0 shared scalar output binary DUT
 
 transection id:          26
 input binary: 
-00101110100011110000000000000000
+10101110100011110000000000000000
 -34.000000    : FP32 scale
-1.117188    : FP32 mantissa
-xxxxxxx01001000  1.125000    :INT8 element mantissa output binary REF
-xxxxxxx01001000  1.125000    :INT8 element mantissa output binary DUT
+-1.117188    : FP32 mantissa
+xxxxxxx10111000  -1.125000    :INT8 element mantissa output binary REF
+xxxxxxx10111000  -1.125000    :INT8 element mantissa output binary DUT
 x01011101  -34.000000    :E8M0 shared scalar output binary REF
 x01011101  -34.000000    :E8M0 shared scalar output binary DUT
 0  :o_overflow output binary REF
@@ -316,11 +316,11 @@ x01010000  -47.000000    :E8M0 shared scalar output binary DUT
 
 transection id:          28
 input binary: 
-00010001000011110000000000000000
+10010001000011110000000000000000
 -93.000000    : FP32 scale
-1.117188    : FP32 mantissa
-xxxxxxx01001000  1.125000    :INT8 element mantissa output binary REF
-xxxxxxx01001000  1.125000    :INT8 element mantissa output binary DUT
+-1.117188    : FP32 mantissa
+xxxxxxx10111000  -1.125000    :INT8 element mantissa output binary REF
+xxxxxxx10111000  -1.125000    :INT8 element mantissa output binary DUT
 x00100010  -93.000000    :E8M0 shared scalar output binary REF
 x00100010  -93.000000    :E8M0 shared scalar output binary DUT
 0  :o_overflow output binary REF
@@ -338,11 +338,11 @@ x00101010  -85.000000    :E8M0 shared scalar output binary DUT
 
 transection id:          30
 input binary: 
-00111010010110110000000000000000
+10111010010110110000000000000000
 -11.000000    : FP32 scale
-1.710938    : FP32 mantissa
-xxxxxxx01101110  1.718750    :INT8 element mantissa output binary REF
-xxxxxxx01101110  1.718750    :INT8 element mantissa output binary DUT
+-1.710938    : FP32 mantissa
+xxxxxxx10010010  -1.718750    :INT8 element mantissa output binary REF
+xxxxxxx10010010  -1.718750    :INT8 element mantissa output binary DUT
 x01110100  -11.000000    :E8M0 shared scalar output binary REF
 x01110100  -11.000000    :E8M0 shared scalar output binary DUT
 0  :o_overflow output binary REF
@@ -360,11 +360,11 @@ x00101010  -85.000000    :E8M0 shared scalar output binary DUT
 
 transection id:          32
 input binary: 
-00010101110101110000000000000000
+10010101110101110000000000000000
 -84.000000    : FP32 scale
-1.679688    : FP32 mantissa
-xxxxxxx01101100  1.687500    :INT8 element mantissa output binary REF
-xxxxxxx01101100  1.687500    :INT8 element mantissa output binary DUT
+-1.679688    : FP32 mantissa
+xxxxxxx10010100  -1.687500    :INT8 element mantissa output binary REF
+xxxxxxx10010100  -1.687500    :INT8 element mantissa output binary DUT
 x00101011  -84.000000    :E8M0 shared scalar output binary REF
 x00101011  -84.000000    :E8M0 shared scalar output binary DUT
 0  :o_overflow output binary REF
@@ -382,11 +382,11 @@ x01111010  -5.000000    :E8M0 shared scalar output binary DUT
 
 transection id:          34
 input binary: 
-00100100011011110000000000000000
+10100100011011110000000000000000
 -55.000000    : FP32 scale
-1.867188    : FP32 mantissa
-xxxxxxx01111000  1.875000    :INT8 element mantissa output binary REF
-xxxxxxx01111000  1.875000    :INT8 element mantissa output binary DUT
+-1.867188    : FP32 mantissa
+xxxxxxx10001000  -1.875000    :INT8 element mantissa output binary REF
+xxxxxxx10001000  -1.875000    :INT8 element mantissa output binary DUT
 x01001000  -55.000000    :E8M0 shared scalar output binary REF
 x01001000  -55.000000    :E8M0 shared scalar output binary DUT
 0  :o_overflow output binary REF
@@ -404,11 +404,11 @@ x00010011  -108.000000    :E8M0 shared scalar output binary DUT
 
 transection id:          36
 input binary: 
-00111001111001010000000000000000
+10111001111001010000000000000000
 -12.000000    : FP32 scale
-1.789062    : FP32 mantissa
-xxxxxxx01110010  1.781250    :INT8 element mantissa output binary REF
-xxxxxxx01110010  1.781250    :INT8 element mantissa output binary DUT
+-1.789062    : FP32 mantissa
+xxxxxxx10001110  -1.781250    :INT8 element mantissa output binary REF
+xxxxxxx10001110  -1.781250    :INT8 element mantissa output binary DUT
 x01110011  -12.000000    :E8M0 shared scalar output binary REF
 x01110011  -12.000000    :E8M0 shared scalar output binary DUT
 0  :o_overflow output binary REF
@@ -921,7 +921,7 @@ xxxxxxx00000000  0.000000    :INT8 element mantissa output binary DUT
 x00000000  -127.000000    :E8M0 shared scalar output binary REF
 x00000000  -127.000000    :E8M0 shared scalar output binary DUT
 0  :o_overflow output binary REF
-subnormal normal case
+subnormal tie to even case
 
 transection id:          79
 input binary: 
@@ -938,28 +938,27 @@ x00000000  -127.000000    :E8M0 shared scalar output binary DUT
 
 transection id:          80
 input binary: 
-10000000010011000001111000100101
+10000000010010010000000000000000
 -126.000000    : FP32 scale
--0.594670    : FP32 mantissa
+-0.570312    : FP32 mantissa
 in scale: -127 version
--1.189340    : FP32 mantissa
-xxxxxxx11011010  -0.593750    :INT8 element mantissa output binary REF
-xxxxxxx10110100  -1.187500    :INT8 element mantissa output binary DUT
+-1.140625    : FP32 mantissa
+xxxxxxx11011100  -0.562500    :INT8 element mantissa output binary REF
+xxxxxxx10110111  -1.140625    :INT8 element mantissa output binary DUT
 x00000000  -127.000000    :E8M0 shared scalar output binary REF
 x00000000  -127.000000    :E8M0 shared scalar output binary DUT
 ERROR elements not match
 0  :o_overflow output binary REF
-subnormal carry case
 
 transection id:          81
 input binary: 
-00000000010001000111110001001001
+00000000001010110000000000000000
 -126.000000    : FP32 scale
-0.535043    : FP32 mantissa
+0.335938    : FP32 mantissa
 in scale: -127 version
-1.070086    : FP32 mantissa
-xxxxxxx00100010  0.531250    :INT8 element mantissa output binary REF
-xxxxxxx01000100  1.062500    :INT8 element mantissa output binary DUT
+0.671875    : FP32 mantissa
+xxxxxxx00010110  0.343750    :INT8 element mantissa output binary REF
+xxxxxxx00101011  0.671875    :INT8 element mantissa output binary DUT
 x00000000  -127.000000    :E8M0 shared scalar output binary REF
 x00000000  -127.000000    :E8M0 shared scalar output binary DUT
 ERROR elements not match
@@ -967,28 +966,28 @@ ERROR elements not match
 
 transection id:          82
 input binary: 
-10000000011110110000001101001011
+10000000000011010000000000000000
 -126.000000    : FP32 scale
--0.961038    : FP32 mantissa
+-0.101562    : FP32 mantissa
 in scale: -127 version
--1.922076    : FP32 mantissa
-xxxxxxx11000010  -0.968750    :INT8 element mantissa output binary REF
-xxxxxxx10000101  -1.921875    :INT8 element mantissa output binary DUT
+-0.203125    : FP32 mantissa
+xxxxxxx11111010  -0.093750    :INT8 element mantissa output binary REF
+xxxxxxx11110011  -0.203125    :INT8 element mantissa output binary DUT
 x00000000  -127.000000    :E8M0 shared scalar output binary REF
 x00000000  -127.000000    :E8M0 shared scalar output binary DUT
 ERROR elements not match
 0  :o_overflow output binary REF
-subnormal zero case
+subnormal scale carry case
 
 transection id:          83
 input binary: 
-00000000000011111001011110000110
+00000000001000010000000000000000
 -126.000000    : FP32 scale
-0.121812    : FP32 mantissa
+0.257812    : FP32 mantissa
 in scale: -127 version
-0.243623    : FP32 mantissa
-xxxxxxx00001000  0.125000    :INT8 element mantissa output binary REF
-xxxxxxx00010000  0.250000    :INT8 element mantissa output binary DUT
+0.515625    : FP32 mantissa
+xxxxxxx00010000  0.250000    :INT8 element mantissa output binary REF
+xxxxxxx00100001  0.515625    :INT8 element mantissa output binary DUT
 x00000000  -127.000000    :E8M0 shared scalar output binary REF
 x00000000  -127.000000    :E8M0 shared scalar output binary DUT
 ERROR elements not match
@@ -996,40 +995,42 @@ ERROR elements not match
 
 transection id:          84
 input binary: 
-10000000000000000000000000000000
+10000000011111110100000001101010
 -126.000000    : FP32 scale
--0.000000    : FP32 mantissa
+-0.994153    : FP32 mantissa
 in scale: -127 version
--0.000000    : FP32 mantissa
-xxxxxxx00000000  0.000000    :INT8 element mantissa output binary REF
-xxxxxxx00000000  0.000000    :INT8 element mantissa output binary DUT
+-1.988307    : FP32 mantissa
+xxxxxxx11000000  -1.000000    :INT8 element mantissa output binary REF
+xxxxxxx10000001  -1.984375    :INT8 element mantissa output binary DUT
 x00000000  -127.000000    :E8M0 shared scalar output binary REF
 x00000000  -127.000000    :E8M0 shared scalar output binary DUT
+ERROR elements not match
 0  :o_overflow output binary REF
 subnormal normal case
 
 transection id:          85
 input binary: 
-00000000000000000000000000000000
+00000000011111111001111001001011
 -126.000000    : FP32 scale
-0.000000    : FP32 mantissa
+0.997018    : FP32 mantissa
 in scale: -127 version
-0.000000    : FP32 mantissa
-xxxxxxx00000000  0.000000    :INT8 element mantissa output binary REF
-xxxxxxx00000000  0.000000    :INT8 element mantissa output binary DUT
+1.994036    : FP32 mantissa
+xxxxxxx01000000  1.000000    :INT8 element mantissa output binary REF
+xxxxxxx01000000  1.000000    :INT8 element mantissa output binary DUT
 x00000000  -127.000000    :E8M0 shared scalar output binary REF
-x00000000  -127.000000    :E8M0 shared scalar output binary DUT
+x00000001  -126.000000    :E8M0 shared scalar output binary DUT
+ERROR scale not match
 0  :o_overflow output binary REF
 
 transection id:          86
 input binary: 
-10000000001000111111111111101000
+10000000010110000000010100100011
 -126.000000    : FP32 scale
--0.281247    : FP32 mantissa
+-0.687657    : FP32 mantissa
 in scale: -127 version
--0.562494    : FP32 mantissa
-xxxxxxx11101110  -0.281250    :INT8 element mantissa output binary REF
-xxxxxxx11011100  -0.562500    :INT8 element mantissa output binary DUT
+-1.375314    : FP32 mantissa
+xxxxxxx11010100  -0.687500    :INT8 element mantissa output binary REF
+xxxxxxx10101000  -1.375000    :INT8 element mantissa output binary DUT
 x00000000  -127.000000    :E8M0 shared scalar output binary REF
 x00000000  -127.000000    :E8M0 shared scalar output binary DUT
 ERROR elements not match
@@ -1038,13 +1039,13 @@ subnormal carry case
 
 transection id:          87
 input binary: 
-00000000011001110101101111101100
+00000000000100110000010000111001
 -126.000000    : FP32 scale
-0.807493    : FP32 mantissa
+0.148566    : FP32 mantissa
 in scale: -127 version
-1.614985    : FP32 mantissa
-xxxxxxx00110100  0.812500    :INT8 element mantissa output binary REF
-xxxxxxx01100111  1.609375    :INT8 element mantissa output binary DUT
+0.297133    : FP32 mantissa
+xxxxxxx00001010  0.156250    :INT8 element mantissa output binary REF
+xxxxxxx00010011  0.296875    :INT8 element mantissa output binary DUT
 x00000000  -127.000000    :E8M0 shared scalar output binary REF
 x00000000  -127.000000    :E8M0 shared scalar output binary DUT
 ERROR elements not match
@@ -1052,13 +1053,13 @@ ERROR elements not match
 
 transection id:          88
 input binary: 
-10000000010010010110010111001001
+10000000001010010110010101100111
 -126.000000    : FP32 scale
--0.573419    : FP32 mantissa
+-0.323407    : FP32 mantissa
 in scale: -127 version
--1.146837    : FP32 mantissa
-xxxxxxx11011100  -0.562500    :INT8 element mantissa output binary REF
-xxxxxxx10110111  -1.140625    :INT8 element mantissa output binary DUT
+-0.646814    : FP32 mantissa
+xxxxxxx11101011  -0.328125    :INT8 element mantissa output binary REF
+xxxxxxx11010111  -0.640625    :INT8 element mantissa output binary DUT
 x00000000  -127.000000    :E8M0 shared scalar output binary REF
 x00000000  -127.000000    :E8M0 shared scalar output binary DUT
 ERROR elements not match
@@ -1067,13 +1068,13 @@ subnormal zero case
 
 transection id:          89
 input binary: 
-00000000001111110001010011010100
+00000000011000010011100110000010
 -126.000000    : FP32 scale
-0.492823    : FP32 mantissa
+0.759567    : FP32 mantissa
 in scale: -127 version
-0.985646    : FP32 mantissa
-xxxxxxx00100000  0.500000    :INT8 element mantissa output binary REF
-xxxxxxx00111111  0.984375    :INT8 element mantissa output binary DUT
+1.519135    : FP32 mantissa
+xxxxxxx00110000  0.750000    :INT8 element mantissa output binary REF
+xxxxxxx01100001  1.515625    :INT8 element mantissa output binary DUT
 x00000000  -127.000000    :E8M0 shared scalar output binary REF
 x00000000  -127.000000    :E8M0 shared scalar output binary DUT
 ERROR elements not match
@@ -1091,7 +1092,7 @@ xxxxxxx00000000  0.000000    :INT8 element mantissa output binary DUT
 x00000000  -127.000000    :E8M0 shared scalar output binary REF
 x00000000  -127.000000    :E8M0 shared scalar output binary DUT
 0  :o_overflow output binary REF
-zero case
+subnormal tie to even case
 
 transection id:          91
 input binary: 
@@ -1108,49 +1109,306 @@ x00000000  -127.000000    :E8M0 shared scalar output binary DUT
 
 transection id:          92
 input binary: 
-10001110100000000000000000000000
--98.000000    : FP32 scale
--1.000000    : FP32 mantissa
-xxxxxxx11000000  -1.000000    :INT8 element mantissa output binary REF
-xxxxxxx11000000  -1.000000    :INT8 element mantissa output binary DUT
-x00011101  -98.000000    :E8M0 shared scalar output binary REF
-x00011101  -98.000000    :E8M0 shared scalar output binary DUT
+10000000001110010000000000000000
+-126.000000    : FP32 scale
+-0.445312    : FP32 mantissa
+in scale: -127 version
+-0.890625    : FP32 mantissa
+xxxxxxx11100100  -0.437500    :INT8 element mantissa output binary REF
+xxxxxxx11000111  -0.890625    :INT8 element mantissa output binary DUT
+x00000000  -127.000000    :E8M0 shared scalar output binary REF
+x00000000  -127.000000    :E8M0 shared scalar output binary DUT
+ERROR elements not match
 0  :o_overflow output binary REF
 
 transection id:          93
 input binary: 
-00100100100000000000000000000000
--54.000000    : FP32 scale
-1.000000    : FP32 mantissa
-xxxxxxx01000000  1.000000    :INT8 element mantissa output binary REF
-xxxxxxx01000000  1.000000    :INT8 element mantissa output binary DUT
-x01001001  -54.000000    :E8M0 shared scalar output binary REF
-x01001001  -54.000000    :E8M0 shared scalar output binary DUT
+00000000011100110000000000000000
+-126.000000    : FP32 scale
+0.898438    : FP32 mantissa
+in scale: -127 version
+1.796875    : FP32 mantissa
+xxxxxxx00111010  0.906250    :INT8 element mantissa output binary REF
+xxxxxxx01110011  1.796875    :INT8 element mantissa output binary DUT
+x00000000  -127.000000    :E8M0 shared scalar output binary REF
+x00000000  -127.000000    :E8M0 shared scalar output binary DUT
+ERROR elements not match
 0  :o_overflow output binary REF
 
 transection id:          94
 input binary: 
-10010110000000000000000000000000
--83.000000    : FP32 scale
--1.000000    : FP32 mantissa
-xxxxxxx11000000  -1.000000    :INT8 element mantissa output binary REF
-xxxxxxx11000000  -1.000000    :INT8 element mantissa output binary DUT
-x00101100  -83.000000    :E8M0 shared scalar output binary REF
-x00101100  -83.000000    :E8M0 shared scalar output binary DUT
+10000000001000110000000000000000
+-126.000000    : FP32 scale
+-0.273438    : FP32 mantissa
+in scale: -127 version
+-0.546875    : FP32 mantissa
+xxxxxxx11101110  -0.281250    :INT8 element mantissa output binary REF
+xxxxxxx11011101  -0.546875    :INT8 element mantissa output binary DUT
+x00000000  -127.000000    :E8M0 shared scalar output binary REF
+x00000000  -127.000000    :E8M0 shared scalar output binary DUT
+ERROR elements not match
 0  :o_overflow output binary REF
+subnormal scale carry case
 
 transection id:          95
 input binary: 
-00101101000000000000000000000000
--37.000000    : FP32 scale
-1.000000    : FP32 mantissa
-xxxxxxx01000000  1.000000    :INT8 element mantissa output binary REF
-xxxxxxx01000000  1.000000    :INT8 element mantissa output binary DUT
-x01011010  -37.000000    :E8M0 shared scalar output binary REF
-x01011010  -37.000000    :E8M0 shared scalar output binary DUT
+00000000010011110000000000000000
+-126.000000    : FP32 scale
+0.617188    : FP32 mantissa
+in scale: -127 version
+1.234375    : FP32 mantissa
+xxxxxxx00101000  0.625000    :INT8 element mantissa output binary REF
+xxxxxxx01001111  1.234375    :INT8 element mantissa output binary DUT
+x00000000  -127.000000    :E8M0 shared scalar output binary REF
+x00000000  -127.000000    :E8M0 shared scalar output binary DUT
+ERROR elements not match
 0  :o_overflow output binary REF
 
 transection id:          96
+input binary: 
+10000000011111111101011001101001
+-126.000000    : FP32 scale
+-0.998731    : FP32 mantissa
+in scale: -127 version
+-1.997462    : FP32 mantissa
+xxxxxxx11000000  -1.000000    :INT8 element mantissa output binary REF
+xxxxxxx11000000  -1.000000    :INT8 element mantissa output binary DUT
+x00000000  -127.000000    :E8M0 shared scalar output binary REF
+x00000001  -126.000000    :E8M0 shared scalar output binary DUT
+ERROR scale not match
+0  :o_overflow output binary REF
+subnormal normal case
+
+transection id:          97
+input binary: 
+00000000011111110100100111000101
+-126.000000    : FP32 scale
+0.994439    : FP32 mantissa
+in scale: -127 version
+1.988878    : FP32 mantissa
+xxxxxxx01000000  1.000000    :INT8 element mantissa output binary REF
+xxxxxxx01111111  1.984375    :INT8 element mantissa output binary DUT
+x00000000  -127.000000    :E8M0 shared scalar output binary REF
+x00000000  -127.000000    :E8M0 shared scalar output binary DUT
+ERROR elements not match
+0  :o_overflow output binary REF
+
+transection id:          98
+input binary: 
+10000000001000011101100001010001
+-126.000000    : FP32 scale
+-0.264414    : FP32 mantissa
+in scale: -127 version
+-0.528828    : FP32 mantissa
+xxxxxxx11101111  -0.265625    :INT8 element mantissa output binary REF
+xxxxxxx11011110  -0.531250    :INT8 element mantissa output binary DUT
+x00000000  -127.000000    :E8M0 shared scalar output binary REF
+x00000000  -127.000000    :E8M0 shared scalar output binary DUT
+ERROR elements not match
+0  :o_overflow output binary REF
+subnormal carry case
+
+transection id:          99
+input binary: 
+00000000011011100110010101001010
+-126.000000    : FP32 scale
+0.862466    : FP32 mantissa
+in scale: -127 version
+1.724932    : FP32 mantissa
+xxxxxxx00110111  0.859375    :INT8 element mantissa output binary REF
+xxxxxxx01101110  1.718750    :INT8 element mantissa output binary DUT
+x00000000  -127.000000    :E8M0 shared scalar output binary REF
+x00000000  -127.000000    :E8M0 shared scalar output binary DUT
+ERROR elements not match
+0  :o_overflow output binary REF
+
+transection id:         100
+input binary: 
+10000000001101111001101011000100
+-126.000000    : FP32 scale
+-0.434411    : FP32 mantissa
+in scale: -127 version
+-0.868821    : FP32 mantissa
+xxxxxxx11100100  -0.437500    :INT8 element mantissa output binary REF
+xxxxxxx11001000  -0.875000    :INT8 element mantissa output binary DUT
+x00000000  -127.000000    :E8M0 shared scalar output binary REF
+x00000000  -127.000000    :E8M0 shared scalar output binary DUT
+ERROR elements not match
+0  :o_overflow output binary REF
+subnormal zero case
+
+transection id:         101
+input binary: 
+00000000011011111110111010000110
+-126.000000    : FP32 scale
+0.874467    : FP32 mantissa
+in scale: -127 version
+1.748933    : FP32 mantissa
+xxxxxxx00111000  0.875000    :INT8 element mantissa output binary REF
+xxxxxxx01110000  1.750000    :INT8 element mantissa output binary DUT
+x00000000  -127.000000    :E8M0 shared scalar output binary REF
+x00000000  -127.000000    :E8M0 shared scalar output binary DUT
+ERROR elements not match
+0  :o_overflow output binary REF
+
+transection id:         102
+input binary: 
+10000000000000000000000000000000
+-126.000000    : FP32 scale
+-0.000000    : FP32 mantissa
+in scale: -127 version
+-0.000000    : FP32 mantissa
+xxxxxxx00000000  0.000000    :INT8 element mantissa output binary REF
+xxxxxxx00000000  0.000000    :INT8 element mantissa output binary DUT
+x00000000  -127.000000    :E8M0 shared scalar output binary REF
+x00000000  -127.000000    :E8M0 shared scalar output binary DUT
+0  :o_overflow output binary REF
+subnormal tie to even case
+
+transection id:         103
+input binary: 
+00000000000000000000000000000000
+-126.000000    : FP32 scale
+0.000000    : FP32 mantissa
+in scale: -127 version
+0.000000    : FP32 mantissa
+xxxxxxx00000000  0.000000    :INT8 element mantissa output binary REF
+xxxxxxx00000000  0.000000    :INT8 element mantissa output binary DUT
+x00000000  -127.000000    :E8M0 shared scalar output binary REF
+x00000000  -127.000000    :E8M0 shared scalar output binary DUT
+0  :o_overflow output binary REF
+
+transection id:         104
+input binary: 
+10000000000000110000000000000000
+-126.000000    : FP32 scale
+-0.023438    : FP32 mantissa
+in scale: -127 version
+-0.046875    : FP32 mantissa
+xxxxxxx11111110  -0.031250    :INT8 element mantissa output binary REF
+xxxxxxx11111101  -0.046875    :INT8 element mantissa output binary DUT
+x00000000  -127.000000    :E8M0 shared scalar output binary REF
+x00000000  -127.000000    :E8M0 shared scalar output binary DUT
+ERROR elements not match
+0  :o_overflow output binary REF
+
+transection id:         105
+input binary: 
+00000000000010010000000000000000
+-126.000000    : FP32 scale
+0.070312    : FP32 mantissa
+in scale: -127 version
+0.140625    : FP32 mantissa
+xxxxxxx00000100  0.062500    :INT8 element mantissa output binary REF
+xxxxxxx00001001  0.140625    :INT8 element mantissa output binary DUT
+x00000000  -127.000000    :E8M0 shared scalar output binary REF
+x00000000  -127.000000    :E8M0 shared scalar output binary DUT
+ERROR elements not match
+0  :o_overflow output binary REF
+
+transection id:         106
+input binary: 
+10000000010111010000000000000000
+-126.000000    : FP32 scale
+-0.726562    : FP32 mantissa
+in scale: -127 version
+-1.453125    : FP32 mantissa
+xxxxxxx11010010  -0.718750    :INT8 element mantissa output binary REF
+xxxxxxx10100011  -1.453125    :INT8 element mantissa output binary DUT
+x00000000  -127.000000    :E8M0 shared scalar output binary REF
+x00000000  -127.000000    :E8M0 shared scalar output binary DUT
+ERROR elements not match
+0  :o_overflow output binary REF
+subnormal scale carry case
+
+transection id:         107
+input binary: 
+00000000010111010000000000000000
+-126.000000    : FP32 scale
+0.726562    : FP32 mantissa
+in scale: -127 version
+1.453125    : FP32 mantissa
+xxxxxxx00101110  0.718750    :INT8 element mantissa output binary REF
+xxxxxxx01011101  1.453125    :INT8 element mantissa output binary DUT
+x00000000  -127.000000    :E8M0 shared scalar output binary REF
+x00000000  -127.000000    :E8M0 shared scalar output binary DUT
+ERROR elements not match
+0  :o_overflow output binary REF
+
+transection id:         108
+input binary: 
+10000000011111110100110101100000
+-126.000000    : FP32 scale
+-0.994549    : FP32 mantissa
+in scale: -127 version
+-1.989098    : FP32 mantissa
+xxxxxxx11000000  -1.000000    :INT8 element mantissa output binary REF
+xxxxxxx10000001  -1.984375    :INT8 element mantissa output binary DUT
+x00000000  -127.000000    :E8M0 shared scalar output binary REF
+x00000000  -127.000000    :E8M0 shared scalar output binary DUT
+ERROR elements not match
+0  :o_overflow output binary REF
+zero case
+
+transection id:         109
+input binary: 
+00000000011111110111110101100100
+-126.000000    : FP32 scale
+0.996014    : FP32 mantissa
+in scale: -127 version
+1.992028    : FP32 mantissa
+xxxxxxx01000000  1.000000    :INT8 element mantissa output binary REF
+xxxxxxx01111111  1.984375    :INT8 element mantissa output binary DUT
+x00000000  -127.000000    :E8M0 shared scalar output binary REF
+x00000000  -127.000000    :E8M0 shared scalar output binary DUT
+ERROR elements not match
+0  :o_overflow output binary REF
+
+transection id:         110
+input binary: 
+10110001000000000000000000000000
+-29.000000    : FP32 scale
+-1.000000    : FP32 mantissa
+xxxxxxx11000000  -1.000000    :INT8 element mantissa output binary REF
+xxxxxxx11000000  -1.000000    :INT8 element mantissa output binary DUT
+x01100010  -29.000000    :E8M0 shared scalar output binary REF
+x01100010  -29.000000    :E8M0 shared scalar output binary DUT
+0  :o_overflow output binary REF
+
+transection id:         111
+input binary: 
+00101011000000000000000000000000
+-41.000000    : FP32 scale
+1.000000    : FP32 mantissa
+xxxxxxx01000000  1.000000    :INT8 element mantissa output binary REF
+xxxxxxx01000000  1.000000    :INT8 element mantissa output binary DUT
+x01010110  -41.000000    :E8M0 shared scalar output binary REF
+x01010110  -41.000000    :E8M0 shared scalar output binary DUT
+0  :o_overflow output binary REF
+
+transection id:         112
+input binary: 
+10001000000000000000000000000000
+-111.000000    : FP32 scale
+-1.000000    : FP32 mantissa
+xxxxxxx11000000  -1.000000    :INT8 element mantissa output binary REF
+xxxxxxx11000000  -1.000000    :INT8 element mantissa output binary DUT
+x00010000  -111.000000    :E8M0 shared scalar output binary REF
+x00010000  -111.000000    :E8M0 shared scalar output binary DUT
+0  :o_overflow output binary REF
+
+transection id:         113
+input binary: 
+00110001100000000000000000000000
+-28.000000    : FP32 scale
+1.000000    : FP32 mantissa
+xxxxxxx01000000  1.000000    :INT8 element mantissa output binary REF
+xxxxxxx01000000  1.000000    :INT8 element mantissa output binary DUT
+x01100011  -28.000000    :E8M0 shared scalar output binary REF
+x01100011  -28.000000    :E8M0 shared scalar output binary DUT
+0  :o_overflow output binary REF
+
+transection id:         114
 input binary: 
 10101110000000000000000000000000
 -35.000000    : FP32 scale
@@ -1161,47 +1419,47 @@ x01011100  -35.000000    :E8M0 shared scalar output binary REF
 x01011100  -35.000000    :E8M0 shared scalar output binary DUT
 0  :o_overflow output binary REF
 
-transection id:          97
+transection id:         115
 input binary: 
-00001000000000000000000000000000
--111.000000    : FP32 scale
+00001010000000000000000000000000
+-107.000000    : FP32 scale
 1.000000    : FP32 mantissa
 xxxxxxx01000000  1.000000    :INT8 element mantissa output binary REF
 xxxxxxx01000000  1.000000    :INT8 element mantissa output binary DUT
-x00010000  -111.000000    :E8M0 shared scalar output binary REF
-x00010000  -111.000000    :E8M0 shared scalar output binary DUT
+x00010100  -107.000000    :E8M0 shared scalar output binary REF
+x00010100  -107.000000    :E8M0 shared scalar output binary DUT
 0  :o_overflow output binary REF
 
-transection id:          98
+transection id:         116
 input binary: 
-10100011000000000000000000000000
--57.000000    : FP32 scale
+10011100000000000000000000000000
+-71.000000    : FP32 scale
 -1.000000    : FP32 mantissa
 xxxxxxx11000000  -1.000000    :INT8 element mantissa output binary REF
 xxxxxxx11000000  -1.000000    :INT8 element mantissa output binary DUT
-x01000110  -57.000000    :E8M0 shared scalar output binary REF
-x01000110  -57.000000    :E8M0 shared scalar output binary DUT
+x00111000  -71.000000    :E8M0 shared scalar output binary REF
+x00111000  -71.000000    :E8M0 shared scalar output binary DUT
 0  :o_overflow output binary REF
 
-transection id:          99
+transection id:         117
 input binary: 
-00110101000000000000000000000000
--21.000000    : FP32 scale
+00110001100000000000000000000000
+-28.000000    : FP32 scale
 1.000000    : FP32 mantissa
 xxxxxxx01000000  1.000000    :INT8 element mantissa output binary REF
 xxxxxxx01000000  1.000000    :INT8 element mantissa output binary DUT
-x01101010  -21.000000    :E8M0 shared scalar output binary REF
-x01101010  -21.000000    :E8M0 shared scalar output binary DUT
+x01100011  -28.000000    :E8M0 shared scalar output binary REF
+x01100011  -28.000000    :E8M0 shared scalar output binary DUT
 0  :o_overflow output binary REF
 
-transection id:         100
+transection id:         118
 input binary: 
-10001110000000000000000000000000
--99.000000    : FP32 scale
+10101101000000000000000000000000
+-37.000000    : FP32 scale
 -1.000000    : FP32 mantissa
 xxxxxxx11000000  -1.000000    :INT8 element mantissa output binary REF
 xxxxxxx11000000  -1.000000    :INT8 element mantissa output binary DUT
-x00011100  -99.000000    :E8M0 shared scalar output binary REF
-x00011100  -99.000000    :E8M0 shared scalar output binary DUT
+x01011010  -37.000000    :E8M0 shared scalar output binary REF
+x01011010  -37.000000    :E8M0 shared scalar output binary DUT
 0  :o_overflow output binary REF
-mx_int8_bd_drv.sv:162: $finish called at 10151000 (1ps)
+mx_int8_bd_drv.sv:168: $finish called at 11951000 (1ps)

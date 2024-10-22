@@ -49,6 +49,7 @@ module mx_int8_bd_drv(
                 data_in.set_tie2even();
                 data_in.randomize();
                 #1;
+                data_in.set_sign(~data_in.sign);
             end
         end
         data_in.set_clean();
@@ -133,6 +134,11 @@ module mx_int8_bd_drv(
         end
         $display("subnormal zero case"); 
         zero_drive();
+        $display("subnormal tie to even case");
+        tie_drive(); 
+        data_in.sub_normal = 1'b1; 
+        $display("subnormal scale carry case");
+        overflow_drive();
         data_in.set_clean();
     endtask
     initial begin
