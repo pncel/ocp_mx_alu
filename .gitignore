@@ -1,5 +1,7 @@
 .vscode/**/*
 tb/tb_mxint8_negate/
 tb/tb*/simv
-tb/tb*/*log
-tb/tb*/*out
+tb/tb*/*.log
+tb/tb*/*.out
+tb/tb*/*.vcd
+tb/tb*/*.ps1
