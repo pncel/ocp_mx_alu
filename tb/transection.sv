@@ -1,5 +1,5 @@
-//`ifndef TRANSECTION__SV
-//`define TRANSECTION__SV
+`ifndef TRANSECTION__SV
+`define TRANSECTION__SV
 `include "scalar_includes.v"
 `include "mxint8_includes.v"
 
@@ -143,7 +143,7 @@ module op_negate_int8;
 
 endmodule
 
-module t_fp32_scale(output [`FLOAT32_WIDTH-1:0] f);
+module t_fp32(output [`FLOAT32_WIDTH-1:0] f);
     reg sign;
     reg sub_normal;
     reg NaN; 
@@ -232,4 +232,4 @@ module t_fp32_scale(output [`FLOAT32_WIDTH-1:0] f);
             mantissa_high = (1<<`FLOAT32_MANTISSA_MXINT8_WIDTH) - 1; 
     endfunction
 endmodule
-//`endif 
+`endif 
