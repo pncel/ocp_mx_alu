@@ -12,7 +12,7 @@ all: compile simulation
 # Compile target
 compile:
 	iverilog -g2012 -o $(OUTPUT_VVP) \
-	    -I $(DESIGN_DIR) \
+	    -I $(DESIGN_DIR) -I $(HIGH_TB_DIR)\
 	    $(DESIGN_FILES) \
 	    $(HIGH_TB_FILES) \
 	    $(TB_FILES)

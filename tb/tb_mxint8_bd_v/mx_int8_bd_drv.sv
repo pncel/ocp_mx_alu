@@ -6,12 +6,13 @@ module mx_int8_bd_drv(
 );
     `include "scalar_includes.v"
     `include "mxint8_includes.v"
+    //`include "transection.sv"
     input wire clk;
     output [`FLOAT32_WIDTH-1:0] gen_float32;  //same as float in c 
     output data_ready_o; 
 
 
-    t_fp32_scalar data_in(.f(gen_float32));
+    t_fp32 data_in(.f(gen_float32));
     task single_drive();
         data_in.randomize(); 
         @(posedge clk) begin
@@ -64,9 +65,9 @@ module mx_int8_bd_drv(
         end
         data_in.set_clean();
     endtask
-    task scalar_overflow_drive();     
+    task scale_overflow_drive();     
         data_in.set_sign(1'b0);
-        data_in.set_scalar_overflow(1'b1);
+        data_in.set_scale_overflow(1'b1);
         repeat(2) begin
             @(posedge clk) begin                
                 data_in.randomize();
@@ -148,7 +149,7 @@ module mx_int8_bd_drv(
             overflow_drive();
         $display("scalar overflow case. due to round and mantissa overflow caused scalar carry. scalar carrys to NaN");
         repeat(3) 
-            scalar_overflow_drive();
+            scale_overflow_drive();
         $display("scalar NaN case");
         repeat(3) 
             NaN_drive();
