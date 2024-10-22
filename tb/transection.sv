@@ -6,30 +6,85 @@
 `define FLOAT32_MANTISSA_MXINT8_WIDTH `MXINT8_ELEMENT_WIDTH-2
 `define FLOAT32_MANTISSA_MXINT8_WIDTH_CUT `FLOAT32_MANTISSA_WIDTH-(`FLOAT32_MANTISSA_MXINT8_WIDTH)
 typedef reg[`MXINT8_ELEMENT_WIDTH-1:0] t_mx_int8;
-typedef reg[`SCALE_WIDTH-1:0] t_scalar;
+typedef reg[`SCALE_WIDTH-1:0] t_scale;
 
 module t_mx_int8_vector(
-    output t_scalar scalar,
+    output t_scale scale,
     output t_mx_int8 elements[0:`BLOCK_SIZE-1]);
-
+    localparam unused_code = 8'b1000_0000;
+    localparam largest_scale = 8'b1111_1111;
+    localparam zero_scale = 8'b0000_0000;
     reg is_nan;
     reg [$clog2(`BLOCK_SIZE):0] zero_num;
 
-    task post_randomize();
+    function void post_randomize();
         zero_num = 0; 
         foreach (elements[i]) begin
           if (elements[i] == 0) begin
             zero_num++;
           end
         end
-    endtask
+    endfunction
 
-    task randomize();
-        scalar = $random() % 256;
+    function void randomize();
+        scale = $random() % 256;
         foreach(elements[i])
             elements[i] = $random() % 256;
         post_randomize();
-    endtask
+    endfunction
+
+    function void set_all_positive();
+        foreach(elements[i])
+            elements[i][`MXINT8_ELEMENT_WIDTH-1] = 1'b0;
+    endfunction
+
+    function void set_all_negative();
+        foreach(elements[i])
+            elements[i][`MXINT8_ELEMENT_WIDTH-1] = 1'b1;
+    endfunction
+
+    function void set_positive_element(int index);
+            elements[index][`MXINT8_ELEMENT_WIDTH-1] = 1'b0;
+    endfunction
+
+    function void set_negative_element(int index);
+            elements[index][`MXINT8_ELEMENT_WIDTH-1] = 1'b1;
+    endfunction
+
+    function void set_all_small_elements();
+        foreach(elements[i]) begin
+            if(elements[i][`MXINT8_ELEMENT_WIDTH-1])
+                elements[i][`MXINT8_ELEMENT_WIDTH-2] = 1'b1;
+            else
+                elements[i][`MXINT8_ELEMENT_WIDTH-2] = 1'b0;
+        end
+    endfunction
+
+    function void set_all_big_elements();
+        foreach(elements[i]) begin
+            if(elements[i][`MXINT8_ELEMENT_WIDTH-1])
+                elements[i][`MXINT8_ELEMENT_WIDTH-2] = 1'b0;
+            else
+                elements[i][`MXINT8_ELEMENT_WIDTH-2] = 1'b1;
+        end
+    endfunction
+
+    function void set_big_element(int index);
+        if(elements[index][`MXINT8_ELEMENT_WIDTH-1])
+            elements[index][`MXINT8_ELEMENT_WIDTH-2] = 1'b0;
+        else
+            elements[index][`MXINT8_ELEMENT_WIDTH-2] = 1'b1;
+    endfunction
+
+    function void set_big_positive(int index);
+        set_positive_element(index);
+        set_big_element(index);
+    endfunction
+
+    function void set_big_negative(int index);
+        set_negative_element(index);
+        set_big_element(index);
+    endfunction
 
     function void set_zero(int elem_index);
         if(elements[elem_index] != 0) begin
@@ -37,33 +92,70 @@ module t_mx_int8_vector(
             zero_num++;
         end
     endfunction
+    
+    function void set_all_zero();
+        foreach(elements[i])
+            elements[i] = `MXINT8_ELEMENT_WIDTH'd0;
+    endfunction
 
+    function void set_unused_encode(int elem_index);
+        elements[elem_index] = unused_code;
+    endfunction
+
+    function void set_all_unused_code();
+        foreach(elements[i])
+            elements[i] = unused_code;
+    endfunction
+
+    function void set_zero_scale();
+        scale = zero_scale;
+    endfunction
+
+    function void set_largest_scale();
+        scale = largest_scale;
+    endfunction
+
+    function void set_sum_positive_carry(int big_positive_num, int is_small_scale);
+        set_largest_scale();
+        scale -= is_small_scale;
+        set_all_small_elements();
+        for(int i = 0; i < big_positive_num; i = i + 1)
+            set_big_positive(i);
+    endfunction
+
+    function void set_sum_negative_carry(int big_negative_num, int is_small_scale);
+        set_largest_scale();
+        scale -= is_small_scale;
+        set_all_small_elements();
+        for(int i = 0; i < big_negative_num; i = i + 1)
+            set_big_negative(i);
+    endfunction
 endmodule
 
 module op_negate_int8;
-    output wire [7:0] input_scalar;
-    output wire [7:0] output_scalar;
+    output wire [7:0] input_scale;
+    output wire [7:0] output_scale;
     output wire [7:0] input_elements[0:31];
     output wire [7:0] output_elements[0:31];
 
-    t_mx_int8_vector a(.scalar(input_scalar),.elements(input_elements));
-    t_mx_int8_vector result(.scalar(output_scalar),.elements(output_elements));
+    t_mx_int8_vector a(.scale(input_scale),.elements(input_elements));
+    t_mx_int8_vector result(.scale(output_scale),.elements(output_elements));
 
 endmodule
 
-module t_fp32_scalar(output [`FLOAT32_WIDTH-1:0] f);
+module t_fp32_scale(output [`FLOAT32_WIDTH-1:0] f);
     reg sign;
     reg sub_normal;
     reg NaN; 
-    reg [`FLOAT32_EXPONENT_WIDTH-1:0] scalar;
+    reg [`FLOAT32_EXPONENT_WIDTH-1:0] scale;
     reg carry; 
     reg[1:0] tie2even; //lsb: whether valid, MSB whether carry  
-    reg overflow; //mantissa overflow, scalar carry
-    reg scalar_overflow;
+    reg overflow; //mantissa overflow, scale carry
+    reg scale_overflow;
     reg [`FLOAT32_MANTISSA_MXINT8_WIDTH-1:0] mantissa_high; 
     reg [`FLOAT32_MANTISSA_MXINT8_WIDTH_CUT-2:0] mantissa_low;
     reg mantissa_low_msb;  
-    assign f = {sign,scalar,mantissa_high,mantissa_low_msb,mantissa_low};
+    assign f = {sign,scale,mantissa_high,mantissa_low_msb,mantissa_low};
     initial begin
         set_clean();
         randomize();
@@ -78,7 +170,7 @@ module t_fp32_scalar(output [`FLOAT32_WIDTH-1:0] f);
         carry = 1'b0;
         tie2even = 2'b00;
         overflow = 1'b0;
-        scalar_overflow = 1'b0; 
+        scale_overflow = 1'b0; 
     endfunction
     function [`FLOAT32_MANTISSA_MXINT8_WIDTH-1:0] random_high();
         return $urandom()%(1<<`FLOAT32_MANTISSA_MXINT8_WIDTH);
@@ -106,9 +198,9 @@ module t_fp32_scalar(output [`FLOAT32_WIDTH-1:0] f);
         tie2even = {random_bit(),1'b1};
         carry = 1'b1;   
     endfunction
-    function void set_scalar_overflow(input overflow_i);
-        scalar_overflow = overflow_i;
-        if(scalar_overflow) begin
+    function void set_scale_overflow(input overflow_i);
+        scale_overflow = overflow_i;
+        if(scale_overflow) begin
             carry = 1'b1;
             overflow = 1'b1;
             NaN = 1'b0; 
@@ -116,13 +208,13 @@ module t_fp32_scalar(output [`FLOAT32_WIDTH-1:0] f);
     endfunction
     function void randomize();
         if(sub_normal)
-            scalar = `FLOAT32_EXPONENT_WIDTH'b0;
+            scale = `FLOAT32_EXPONENT_WIDTH'b0;
         else if(NaN)
-            scalar = {`FLOAT32_EXPONENT_WIDTH{1'b1}};
+            scale = {`FLOAT32_EXPONENT_WIDTH{1'b1}};
         else
-            scalar = $urandom() % (2<<`FLOAT32_EXPONENT_WIDTH-2) +1'b1;
-        if(scalar_overflow)
-            scalar = {`FLOAT32_EXPONENT_WIDTH{1'b1}}-1'b1;
+            scale = $urandom() % (2<<`FLOAT32_EXPONENT_WIDTH-2) +1'b1;
+        if(scale_overflow)
+            scale = {`FLOAT32_EXPONENT_WIDTH{1'b1}}-1'b1;
         mantissa_high = random_high();
         mantissa_low = random_low();
         mantissa_low_msb = random_bit();

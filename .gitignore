@@ -1,2 +1,4 @@
 .vscode/**/*
 tb/tb_mxint8_negate/
+tb/tb*/simv
+tb/tb*/*log

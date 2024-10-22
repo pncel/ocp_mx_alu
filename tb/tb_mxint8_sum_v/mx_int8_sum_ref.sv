@@ -2,7 +2,7 @@
 `include "mxint8_includes.v"
 //under `BLOCK_SIZE = 32, INT8 condition
 `define INT8_MANTISSA_EXT  13 //($clog2(`BLOCK_SIZE)+2)+6
-module mxint8_sum (
+module mx_int8_sum_ref (
     i_scale,
     i_mxint8_elements,
     o_float32,
