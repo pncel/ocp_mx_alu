@@ -106,7 +106,7 @@ module mxint8_broadcast (
                 if ((i_float32[`FLOAT32_EXPONENT_BITS] + 8'd1) == 8'b1111_1111) begin
                     // o_scale = i_float32[`FLOAT32_EXPONENT_BITS];
                     o_scale = 8'b1111_1110;
-                    clamped_rounded_mantissa = 6'b11_1111;
+                    clamped_rounded_mantissa = {6'b11_1111, 17'b0};
                 end
                 else begin
                     o_scale = i_float32[`FLOAT32_EXPONENT_BITS] + 8'd1;
