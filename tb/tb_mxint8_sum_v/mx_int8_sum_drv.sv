@@ -1,9 +1,13 @@
-module mx_int8_sum_drv(
+`timescale 1ns/1ps
+module mx_int8_sum_drv #(
+    parameter int N = 5, //each case repeat times
+    parameter int CYCLE = 100
+    )(
     scale_drv,
     mxint8_elements_drv,
     clk
 );
-    localparam N = 5; //each case repeat times
+    localparam int half = CYCLE/2; 
     `include "scalar_includes.v"
     `include "mxint8_includes.v"
     input  wire clk;
@@ -106,132 +110,134 @@ module mx_int8_sum_drv(
     endfunction
 
     initial begin
+        
         $display("normal_case");
-        repeat(N) begin
+        repeat(5*N) begin
             @(posedge clk) begin
                 normal_case();
             end
-        end
-        $display("all positive number case");
+        end 
+        
+        #(half+1) $display("all positive number case");
         repeat(N) begin
             @(posedge clk) begin
                 positive_case();
             end
         end
-        $display("all negative number case");
+        #(half+1) $display("all negative number case");
         repeat(N) begin
             @(posedge clk) begin
                 negative_case();
             end
         end
-        $display("all small absolute value int8 case");
+        #(half+1) $display("all small absolute value int8 case");
         repeat(N) begin
             @(posedge clk) begin
                 small_case();
             end
         end
-        $display("all big absolute value int8 case");
+        #(half+1) $display("all big absolute value int8 case");
         repeat(N) begin
             @(posedge clk) begin
                 big_case();
             end
         end
-        $display("all zero value case");
+        #(half+1) $display("all zero value case");
         repeat(N) begin
             @(posedge clk) begin
                 all_zero_case();
             end
         end
-        $display("1 random 0 case");
+        #(half+1) $display("1 random 0 case");
         repeat(N) begin
             @(posedge clk) begin
                 single_zero_case();
             end
         end
-        $display("all int8 1000_0000 case");
+        #(half+1) $display("all int8 1000_0000 case");
         repeat(N) begin
             @(posedge clk) begin
                 all_nan_case();
             end
         end
-        $display("1 int8 1000_0000 case");
+        #(half+1) $display("1 int8 1000_0000 case");
         repeat(N) begin
             @(posedge clk) begin
                 single_nan_case();
             end
         end
-        $display("positive carry case");
+        #(half+1) $display("positive carry case");
         repeat(N) begin
             @(posedge clk) begin
                 positive_carry_case();
             end
         end
-        $display("lagest positive carry");
+        #(half+1) $display("lagest positive carry");
         repeat(N) begin
             @(posedge clk) begin
                 positive_carry_max_case();
             end
         end
-        $display("positive number overflow");
+        #(half+1) $display("positive number overflow");
         repeat(N) begin
             @(posedge clk) begin
                 positive_overflow_case();
             end
         end
-        $display("positive overflow with largest carry");
+        #(half+1) $display("positive overflow with largest carry");
         repeat(N) begin
             @(posedge clk) begin
                 positive_overflow_max_case();
             end
         end
-        $display("positive overflow with int8 1000_0000");
+        #(half+1) $display("positive overflow with int8 1000_0000");
         repeat(N) begin
             @(posedge clk) begin
                 positive_overflow_scale_nan();
             end
         end
-    $display("negative carry case");
+    #(half+1) $display("negative carry case");
         repeat(N) begin
             @(posedge clk) begin
                 negative_carry_case();
             end
         end
-        $display("lagest negative carry");
+        #(half+1) $display("lagest negative carry");
         repeat(N) begin
             @(posedge clk) begin
                 negative_carry_max_case();
             end
         end
-        $display("negative number overflow");
+        #(half+1) $display("negative number overflow");
         repeat(N) begin
             @(posedge clk) begin
                 negative_overflow_case();
             end
         end
-        $display("negative overflow with largest carry");
+        #(half+1) $display("negative overflow with largest carry");
         repeat(N) begin
             @(posedge clk) begin
                 negative_overflow_max_case();
             end
         end
-        $display("negative overflow with int8 1000_0000");
+        #(half+1) $display("negative overflow with int8 1000_0000");
         repeat(N) begin
             @(posedge clk) begin
                 negative_overflow_scale_nan();
             end
         end
-        $display("scale 1111_1111 nan case");
+        #(half+1) $display("scale 1111_1111 nan case");
         repeat(N) begin
             @(posedge clk) begin
                 scale_nan_case();
             end
         end
-        $display("scale 1111_1111 and int8 have 1000_0000 case");
+        #(half+1) $display("scale 1111_1111 and int8 have 1000_0000 case");
         repeat(N) begin
             @(posedge clk) begin
                 scale_nan_unusedcode_case();
             end
         end
-
+        $finish();
     end
 endmodule 

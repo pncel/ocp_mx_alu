@@ -10,7 +10,7 @@ typedef reg[`SCALE_WIDTH-1:0] t_scale;
 
 module t_mx_int8_vector(
     output t_scale scale,
-    output t_mx_int8 elements[0:`BLOCK_SIZE-1]);
+    output t_mx_int8 elements[`BLOCK_SIZE-1:0]);
     localparam unused_code = 8'b1000_0000;
     localparam largest_scale = 8'b1111_1111;
     localparam zero_scale = 8'b0000_0000;
@@ -28,8 +28,9 @@ module t_mx_int8_vector(
 
     function void randomize();
         scale = $random() % 256;
-        foreach(elements[i])
+        foreach(elements[i]) begin
             elements[i] = $random() % 256;
+        end
         post_randomize();
     endfunction
 
@@ -143,7 +144,7 @@ module op_negate_int8;
 
 endmodule
 
-module t_fp32(output [`FLOAT32_WIDTH-1:0] f);
+module t_fp32_scale (output [`FLOAT32_WIDTH-1:0] f);
     reg sign;
     reg sub_normal;
     reg NaN; 
