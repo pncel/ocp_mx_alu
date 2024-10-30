@@ -9,13 +9,13 @@ module mxint8_sum (
     `include "scalar_includes.v"
     `include "mxint8_includes.v"
 
-    input  reg [`SCALE_WIDTH-1:0]            i_scale;
-    input  reg [`MXINT8_ELEMENT_WIDTH-1:0]   i_mxint8_elements [BLOCK_SIZE-1:0];
+    input  wire [`SCALE_WIDTH-1:0]            i_scale;
+    input  wire [`MXINT8_ELEMENT_WIDTH-1:0]   i_mxint8_elements [`BLOCK_SIZE-1:0];
     output reg [`FLOAT32_WIDTH-1:0]          o_float32;
     output reg                               o_overflow;
     
-
-    reg [31:0] mxint8_elements_sum, positive_sum;
+    wire [31:0] positive_sum;
+    reg [31:0] mxint8_elements_sum;//, positive_sum;
     reg is_NaN;
 
     // sum up all sign extended MXINT8 elements
@@ -31,11 +31,11 @@ module mxint8_sum (
     // MSB is sign bit because sign extension from previous step
     assign positive_sum = mxint8_elements_sum[31] ? ~mxint8_elements_sum + 1 : mxint8_elements_sum;
 
-    // pass over the sign from the resulting sum
-    assign o_float32[`FLOAT32_SIGN_BIT] = mxint8_elements_sum[31];
-
     // normalize the positive sum of all elements by finding leading 1
     always @(*) begin
+        // pass over the sign from the resulting sum
+        o_float32[`FLOAT32_SIGN_BIT] = mxint8_elements_sum[31];
+
         if (i_scale == 8'b11111111) begin
             // if vector is NaN, then float32 is also NaN
             o_float32[`FLOAT32_MANTISSA_BITS] = 23'd1;
@@ -45,8 +45,9 @@ module mxint8_sum (
         else begin
             unique casez (positive_sum)
                 32'b0000_0000_0000_0000_0000_0000_0000_0000 : begin
-                    o_float32[`FLOAT32_MANTISSA_BITS] = 23'b0;
-                    o_float32[`FLOAT32_EXPONENT_BITS] = 8'b0;
+                    // o_float32[`FLOAT32_MANTISSA_BITS] = 23'b0;
+                    // o_float32[`FLOAT32_EXPONENT_BITS] = 8'b0;
+                    o_float32[30:0] = {23'b0, 8'b0};
                     is_NaN = 1'b0;
                 end
                 32'b0000_0000_0000_0000_0000_0000_0000_0001 : begin
@@ -204,7 +205,7 @@ module mxint8_sum (
                     o_float32[`FLOAT32_EXPONENT_BITS] = i_scale + 8'd20;
                     is_NaN = 1'b0;
                 end
-                default : begin
+                32'b1???_????_????_????_????_????_????_???? : begin
                     o_float32[`FLOAT32_MANTISSA_BITS] = 23'b0;
                     o_float32[`FLOAT32_EXPONENT_BITS] = 8'b11111111;
                     is_NaN = 1'b1;

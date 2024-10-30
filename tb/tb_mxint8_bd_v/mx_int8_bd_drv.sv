@@ -6,13 +6,13 @@ module mx_int8_bd_drv(
 );
     `include "scalar_includes.v"
     `include "mxint8_includes.v"
-    //`include "transection.sv"
+    `include "transection.sv"
     input wire clk;
     output [`FLOAT32_WIDTH-1:0] gen_float32;  //same as float in c 
     output data_ready_o; 
 
 
-    t_fp32 data_in(.f(gen_float32));
+    t_fp32_scale data_in(.f(gen_float32));
     task single_drive();
         data_in.randomize(); 
         @(posedge clk) begin

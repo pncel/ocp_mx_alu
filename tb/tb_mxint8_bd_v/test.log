@@ -1462,4 +1462,4 @@ xxxxxxx11000000  -1.000000    :INT8 element mantissa output binary DUT
 x01011010  -37.000000    :E8M0 shared scalar output binary REF
 x01011010  -37.000000    :E8M0 shared scalar output binary DUT
 0  :o_overflow output binary REF
-mx_int8_bd_drv.sv:168: $finish called at 11951000 (1ps)
+./mx_int8_bd_drv.sv:168: $finish called at 11951000 (1ps)
