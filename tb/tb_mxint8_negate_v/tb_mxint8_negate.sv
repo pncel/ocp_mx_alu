@@ -9,7 +9,7 @@ module tb_mxint8_negate;
    
     mxint8_negate uut (
         .i_mxint8_elements(dut_i_mxint8_elements),
-        .i_treat_unused_encode_as_zero(1'b1),
+        .i_treat_unused_encode_as_zero(1'b1), // TODO: maybe add tests for both
         .o_mxint8_elements(dut_o_mxint8_elements)
     );
 
