@@ -11,6 +11,7 @@ preliminary designs
 | subtract (vector)             | 🫡       | ❌     | ❌     |
 | multiply (vector)             | ❌       | ❌     | ❌     |
 | divide (vector) (optional)    | ❌       | ❌     | ❌     |
+| dot product (vector)    | ❌       | ❌     | ❌     |
 | broadcast (scalar -> vector)  | 😐       | ✅     | ✅     |
 | conversion vector(fp32 -> mxint8) | ❌       | ❌     | ❌     |
 | conversion vector(mxint8 -> fp32) | ❌       | ❌     | ❌     |
