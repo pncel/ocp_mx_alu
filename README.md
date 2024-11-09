@@ -7,8 +7,8 @@ preliminary designs
 
 | function                      | C++ model |Verilog | Testbench    |
 | --------                      | -------   |------- | -------- |
-| add (vector)                  | 🫡       | ❌     | ❌     |
-| subtract (vector)             | 🫡       | ❌     | ❌     |
+| add (vector)                  | ✏️       | ❌     | ❌     |
+| subtract (vector)             | ✏️       | ❌     | ❌     |
 | multiply (vector)             | ❌       | ❌     | ❌     |
 | divide (vector) (optional)    | ❌       | ❌     | ❌     |
 | dot product (vector)    | ❌       | ❌     | ❌     |
@@ -17,6 +17,6 @@ preliminary designs
 | conversion vector(mxint8 -> fp32) | ❌       | ❌     | ❌     |
 | sum (vector -> scalar)        | 😐       | 🤔 (ignores unused encoding)     | ✅     |
 | negate (vector -> vector)     | 😐       | ✅     | ✅     |
-###### (😐=NA, 🤔=UNSURE, 🫡=WIP, ❌=TODO, ✅=DONE)
+###### (😐=NA, 🤔=UNSURE, ✏️=WIP, ❌=TODO, ✅=DONE)
 
 For vector add, subtract, multiply, divide, inspiration can be taken from the scalar equivalents in FP32 implemented [here](https://github.com/pncel/float_by_hand) in C++.
