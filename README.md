@@ -15,7 +15,7 @@ preliminary designs
 | broadcast (scalar -> vector)  | 😐       | ✅     | ✅     |
 | conversion vector(fp32 -> mxint8) | ❌       | ❌     | ❌     |
 | conversion vector(mxint8 -> fp32) | ❌       | ❌     | ❌     |
-| sum (vector -> scalar)        | 😐       | 🤔 (ignores unused encoding)     | ✅     |
+| sum (vector -> scalar)        | 😐       | 🤔 (needs peer review)     | ✅     |
 | negate (vector -> vector)     | 😐       | ✅     | ✅     |
 ###### (😐=NA, 🤔=UNSURE, ✏️=WIP, ❌=TODO, ✅=DONE)
 
