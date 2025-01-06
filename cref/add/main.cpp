@@ -55,20 +55,47 @@ MXINT8_vector mx_add(MXINT8_vector a, MXINT8_vector b) {
     int32_t intermediate_scale_n = static_cast<int32_t>(smaller.scale.to_ulong()) - 127; //n
     // 1: find largest power of 2 less than or equal to what was found in step 1
     // THIS IS ASSUMING BIAS IS APPLIED ALREADY
-    int32_t max_pow2_res_n = static_cast<int32_t>(log2(max_res)) + intermediate_scale_n;
+    int32_t max_pow2_res_n = (static_cast<int32_t>(log2(max_res)) - 6) + intermediate_scale_n; // MINUS 6
 
-    // 2: find largest power of 2 representable in intermediate data type (i assume intermediate has fixed * 2 ^ intermediate scale)
-    int32_t max_rep_n = 23 + intermediate_scale_n;
-    // 3: calls to divide largest pow2 <= max result by the largest pow2 representatble in element data type. (2^n1 / 2^n2)
-    //    however we solve for n values not 2^n values, so we SUBTRACT
-    int32_t new_scale_n = max_pow2_res_n - max_rep_n;
+    // 2: find largest power of 2 representable in MX data type
+    // MXINT8 largest power of 2 is 2^0, we use n from 2^n
+    int32_t max_rep_n = 0;
+
+    // 3: calls to divide largest pow2 <= max result by the largest pow2 representable in element data type (why??). (2^n1 / 2^n2)
+    //    however we solve for the n values not 2^n values, so we SUBTRACT
+
+    int32_t new_scale_n = (max_pow2_res_n - max_rep_n); // no change with MXINT8, subtract 0
     // for proper encoding we bias with 127
-    int32_t new_scale_e8 = new_scale_n + 127;
+    int32_t new_scale_e8 = new_scale_n + 127; // TODO: what to do if this not in [-127, 127]? maybe keep intermediate scale
 
     // 4: scale the elements accordingly, employing roundTiesToEven
+    // normal numbers that exceed the max normal representation of the element
+    // data type should be clamped to the max normal, preserving the sign.
     int32_t scale_change = new_scale_n - intermediate_scale_n;
-    
-    
+
+    /// 4a unecessary, see note above 4b
+    // 4a: bit shift by the change in scale, left if negative, right if positive. 
+    // for (int i = 0; i < 32; i++) {
+    //     if (scale_change < 0) {
+    //         intermediate_sum[i] <<= (scale_change * -1);
+    //     } else {
+    //         int sign = intermediate_sum[i][23];
+    //         intermediate_sum[i] >>= scale_change;
+    //         // this needs to be done with case statements in Verilog
+    //         if (sign) {
+    //             // sign extend
+    //             for (int j = 24-scale_change; j < 24; j++) { // VERIFY
+    //                 intermediate_sum[i].set(j);
+    //             }
+    //         }
+    //     }
+    // }
+    // Note: the scale change equals how much the implicit decimal point should be shifted, left if positive, right if negative
+    // 24-bit intermediate:
+    // 00000000_00000000_00.000000
+    int32_t ones_index = 6 + scale_change; 
+    // 4b: round to even, Clamp if out of range, convert to 8 bit format
+    // refer to sum case statements 
     
 }
 
