@@ -4,23 +4,38 @@
 #include <cassert>
 #include <cstddef>
 #include <iostream>
+#include <cmath>
+
+MXINT8_vector mx_add(MXINT8_vector a, MXINT8_vector b);
+
+uint32_t max_mag (std::array<std::bitset<24>, 32> vector);
+
+std::bitset<24> scaled_sum(std::bitset<8> smaller, std::bitset<8> larger, uint8_t scale_difference);
+
+template<size_t N, size_t M>
+std::bitset<M> bitset_slice(const std::bitset<N>& b, size_t start, size_t length);
 
 int main() {
 
 
     MXINT8_vector a, b;
-    a.scale = 255;  // Set the 8-bit field (max value for 8 bits)
-    b.scale = 0;
+    a.scale = 127;  // Set the 8-bit field (max value for 8 bits)
+    b.scale = 127;
 
     // Fill the array with values
     for (int i = 0; i < 32; ++i) {
         a.elements[i] = i % 256;  // Example values, ensuring they fit in 8 bits
         b.elements[i] = i % 256;
-        std::cout << "diff: " << + a.elements[i] << std::endl;
+        std::cout << "diff: " << + a.elements[i].to_ulong() << std::endl;
+    }
+    std::cout << "" << + a.scale.to_ulong() << std::endl;
+    MXINT8_vector y = mx_add(a,b);
+    // Access elements
+    std::cout << "" << + y.scale.to_ulong() << std::endl;
+    for (int i = 0; i < 32; ++i) {
+        std::cout << "" << + a.elements[i].to_ulong() << " + " << + b.elements[i].to_ulong() << " = " << + y.elements[i].to_ulong() << std::endl;
     }
 
-    // Access elements
-    uint8_t fifthElement = a.elements[4];  // Zero-based indexing
 
     return 0;
 }
@@ -72,31 +87,45 @@ MXINT8_vector mx_add(MXINT8_vector a, MXINT8_vector b) {
     // normal numbers that exceed the max normal representation of the element
     // data type should be clamped to the max normal, preserving the sign.
     int32_t scale_change = new_scale_n - intermediate_scale_n;
-
-    /// 4a unecessary, see note above 4b
-    // 4a: bit shift by the change in scale, left if negative, right if positive. 
-    // for (int i = 0; i < 32; i++) {
-    //     if (scale_change < 0) {
-    //         intermediate_sum[i] <<= (scale_change * -1);
-    //     } else {
-    //         int sign = intermediate_sum[i][23];
-    //         intermediate_sum[i] >>= scale_change;
-    //         // this needs to be done with case statements in Verilog
-    //         if (sign) {
-    //             // sign extend
-    //             for (int j = 24-scale_change; j < 24; j++) { // VERIFY
-    //                 intermediate_sum[i].set(j);
-    //             }
-    //         }
-    //     }
-    // }
     // Note: the scale change equals how much the implicit decimal point should be shifted, left if positive, right if negative
     // 24-bit intermediate:
     // 00000000_00000000_00.000000
     int32_t ones_index = 6 + scale_change; 
     // 4b: round to even, Clamp if out of range, convert to 8 bit format
     // refer to sum case statements 
-    
+    MXINT8_vector y;
+    y.scale = new_scale_e8;
+    for (int i = 0; i < 32; i++) {
+        if (ones_index < 0) { // no rounding needed if scale decreased, just have trailing zeros
+            for (int j = ones_index + 1; j >= 0; j--) {
+                y.elements[i][j] = intermediate_sum[i][j];
+            }
+        } else { // when scale increased / stay the same
+            // perform round to even where necessary
+            if (intermediate_sum[i][ones_index - 7]) { // if tie or greater
+                bool round_up = 0;
+                for (int j = 0; j < ones_index - 7; j++) {
+                    round_up |= intermediate_sum[i][j];
+                }
+                if (round_up || intermediate_sum[i][ones_index - 6]) { // if round_up or there is tie with odd mx-LSB, round up
+                    std::bitset<8> slice = bitset_slice<24, 8>(intermediate_sum[i], ones_index - 6, 8);
+                    if (slice == 0b11111111 || slice == 0b01111111) { // don't round if element capped at max already for this scale
+                        y.elements[i] = slice;
+                    } else {
+                        unsigned long rounded_val = slice.to_ulong() + 1;
+                        y.elements[i] = std::bitset<8>(rounded_val);
+                    }
+                } else { // tie with even mx-LSB, round down (truncate)
+                    std::bitset<8> slice = bitset_slice<24, 8>(intermediate_sum[i], ones_index - 6, 8);
+                    y.elements[i] = slice;
+                }
+            } else { // general round down (truncate) case
+                std::bitset<8> slice = bitset_slice<24, 8>(intermediate_sum[i], ones_index - 6, 8);
+                y.elements[i] = slice;
+            }
+        }
+    }
+    return y;
 }
 
 uint32_t max_mag (std::array<std::bitset<24>, 32> vector) {
@@ -153,4 +182,16 @@ std::bitset<24> scaled_sum(std::bitset<8> smaller, std::bitset<8> larger, uint8_
     
 
     return sum;
+}
+
+
+// perplexity bitset from slice of larger bitset
+template<size_t N, size_t M>
+std::bitset<M> bitset_slice(const std::bitset<N>& b, size_t start, size_t length) {
+    assert(start + length <= N);
+    std::bitset<M> result;
+    for (size_t i = 0; i < length; ++i) {
+        result[i] = b[start + i];
+    }
+    return result;
 }

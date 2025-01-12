@@ -36,7 +36,7 @@ struct FP32_ieee754 {
 
     FP32_ieee754() : sign(0), exponent(0), mantissa(0), bias(127) {}
     
-}
+};
 
 // template<
 //     typename Repr,
