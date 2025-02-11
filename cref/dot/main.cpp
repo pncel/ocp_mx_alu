@@ -15,8 +15,8 @@ FP32_ieee754 to_FP32(int32_t MXINT8_sum_result, int32_t shared_scale);
 int main() {
     
     MXINT8_vector a, b;
-    a.scale = 0;  // Set the 8-bit field (max value for 8 bits)
-    b.scale = 0;
+    a.scale = 140;  // Set the 8-bit field (max value for 8 bits)
+    b.scale = 132;
     
     // Fill the array with values
     for (int i = 0; i < 32; ++i) {
@@ -28,9 +28,9 @@ int main() {
     FP32_ieee754 y = mx_dot(a,b);
     // Access result
     std::cout << "mx_dot FP32 result: " << std::endl;
-    std::cout << "S: " << + y.sign.to_ulong() << std::endl;
-    std::cout << "E: " << + y.exponent.to_ulong() << std::endl;
-    std::cout << "M: " << + y.mantissa.to_ulong() << std::endl;
+    std::cout << "S: " << y.sign << std::endl;
+    std::cout << "E: " << y.exponent << std::endl;
+    std::cout << "M: " << y.mantissa << std::endl;
     
 
     return 0;
@@ -39,16 +39,14 @@ int main() {
 FP32_ieee754 mx_dot(MXINT8_vector a, MXINT8_vector b) {
     // TODO zero case: determine what to do
     // TODO NaN case: determine what to do
-    bool overflow = false;
+
     // Multiply the block scales (X) through adding the scale factors bits after applying bias; 
     // Add because scale bits encode X through 2^(scale_int - 127); need 9 bits
     int32_t new_scale = ((static_cast<int32_t>(a.scale.to_ulong())-127) + (static_cast<int32_t>(b.scale.to_ulong())-127)) + 127;
     std::cout << "new scale " << new_scale << std::endl;
-    // if (new_scale > 254) { //checked in helper function
-    //     //overflow flag potentially, unless zero case
-    //     new_scale = 254;
-    //     overflow = true;
-    // }
+
+    // scale overflow managed in helper function
+    
     // Multiply all the elements, need 16 bits; 
     // sum all the element products, need 21 bits (scalar block 32 = 2^5, 5+16)
     int32_t sum_of_products = 0;
@@ -57,7 +55,8 @@ FP32_ieee754 mx_dot(MXINT8_vector a, MXINT8_vector b) {
         int32_t operand_b = b.elements[i][7] ? b.elements[i].to_ulong() - 256 : b.elements[i].to_ulong(); 
         sum_of_products += operand_a * operand_b;
     }
-    
+    cout << "\n" <<"Intermediate Dot Product Result (extended mxint8 element) " << std::bitset<32> {abs(sum_of_products)} << endl;
+    cout << "\n" <<"Absolute Value " << std::bitset<32> {abs(sum_of_products)} << endl;
     // fit into FP32 (IEEE754) representation, clamp if too large
     return to_FP32(sum_of_products, new_scale);
     //return
@@ -71,13 +70,13 @@ FP32_ieee754 to_FP32(int32_t MXINT8_sum_result, int32_t shared_scale){
     FP32_sum_result.sign = (MXINT8_sum_result >= 0) ? 0 : 1;
     MXINT8_sum_result = abs(MXINT8_sum_result);
 
-    cout << "\n" <<"MXINT8_sum_result = " << MXINT8_sum_result << endl;
+    // cout << "\n" <<"MXINT8_sum_result = " << std::bitset<32> {MXINT8_sum_result} << endl;
     //*************************normal case*************************
 
     //check how many bits MXINT8_sum_result has and shift accordingly
     // RTL: Find leading 1
     int MXINT8_sum_bitcnt = log(MXINT8_sum_result)/log(2) + 1; // checks out 2/10/25
-    cout << "lead hot bit index = " << MXINT8_sum_bitcnt << endl;
+    cout << "lead hot bit index = " << MXINT8_sum_bitcnt-1 << endl;
     //do not overflow
     // - 6 + MXINT8_sum_bitcnt -1 evaluates to the distance the implicit decimal needs to move to be adjacent to the leading 1
     if(shared_scale - 6 + MXINT8_sum_bitcnt -1 > 0){ 
