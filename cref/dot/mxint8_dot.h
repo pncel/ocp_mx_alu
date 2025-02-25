@@ -19,6 +19,9 @@ using s8 = int8_t;
 
 using namespace std;
 
+
+
+
 struct MXINT8_vector {
     std::bitset<8> scale;  // 8-bit field
     uint8_t bias : 8;
@@ -33,11 +36,16 @@ struct FP32_ieee754 {
     std::bitset<8> exponent;  // 8-bit field
     std::bitset<23> mantissa;  // 23-bit field
     uint8_t bias : 8;
-
-    FP32_ieee754() : sign(0), exponent(0), mantissa(0), bias(127) {}
+    bool overflow_flag;
+    bool unused_flag;
+    FP32_ieee754() : sign(0), exponent(0), mantissa(0), bias(127), overflow_flag(false), unused_flag(false) {}
     
 };
 
+
+
+FP32_ieee754 dot_mxint8_reference(MXINT8_vector a, MXINT8_vector b);
+FP32_ieee754 to_FP32(int32_t MXINT8_sum_result, int32_t shared_scale);
 // template<
 //     typename Repr,
 //     Repr scale_mask,

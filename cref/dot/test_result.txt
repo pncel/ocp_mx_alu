@@ -1,0 +1,241 @@
+lead hot bit index = 14
+case0 Mismatch in sign: Expected = 1, Actual = 0
+Mismatch in exponent: Expected = 11111111, Actual = 10101111
+Mismatch in mantissa: Expected = 00011111111111111111111, Actual = 00000000100010000000000
+Mismatch in overflow_flag: Expected = 1, Actual = 0
+answer =1010111100000000100010000000000
+Mismatch in unused_flag: Expected = 1, Actual = 0
+lead hot bit index = 15
+case1 Mismatch in sign: Expected = 1, Actual = 0
+Mismatch in exponent: Expected = 11111111, Actual = 00000000
+Mismatch in mantissa: Expected = 00011111111111111111111, Actual = 11000110110010100000000
+Mismatch in overflow_flag: Expected = 1, Actual = 0
+answer =0000000011000110110010100000000
+Mismatch in unused_flag: Expected = 1, Actual = 0
+lead hot bit index = 16
+case2 Mismatch in sign: Expected = 1, Actual = 0
+Mismatch in exponent: Expected = 11111111, Actual = 11000011
+Mismatch in mantissa: Expected = 00011111111111111111111, Actual = 00101100111000110000000
+Mismatch in overflow_flag: Expected = 1, Actual = 0
+answer =1100001100101100111000110000000
+Mismatch in unused_flag: Expected = 1, Actual = 0
+lead hot bit index = 12
+case3 Mismatch in sign: Expected = 1, Actual = 0
+Mismatch in exponent: Expected = 11111111, Actual = 11111110
+Mismatch in mantissa: Expected = 00011111111111111111111, Actual = 11111111111111111111111
+Mismatch in overflow_flag: Expected = 1, Actual = 0
+answer =1111111011111111111111111111111
+Mismatch in unused_flag: Expected = 1, Actual = 0
+lead hot bit index = 14
+case4 Mismatch in sign: Expected = 1, Actual = 0
+Mismatch in exponent: Expected = 11111111, Actual = 11111110
+Mismatch in mantissa: Expected = 00011111111111111111111, Actual = 11111111111111111111111
+Mismatch in overflow_flag: Expected = 1, Actual = 0
+answer =1111111011111111111111111111111
+Mismatch in unused_flag: Expected = 1, Actual = 0
+lead hot bit index = 12
+case5 Mismatch in exponent: Expected = 11111111, Actual = 11111110
+Mismatch in mantissa: Expected = 00011111111111111111111, Actual = 11111111111111111111111
+Mismatch in overflow_flag: Expected = 1, Actual = 0
+answer =1111111011111111111111111111111
+Mismatch in unused_flag: Expected = 1, Actual = 0
+lead hot bit index = 11
+case6 Mismatch in sign: Expected = 1, Actual = 0
+Mismatch in exponent: Expected = 11111111, Actual = 01010010
+Mismatch in mantissa: Expected = 00011111111111111111111, Actual = 10011000010000000000000
+Mismatch in overflow_flag: Expected = 1, Actual = 0
+answer =0101001010011000010000000000000
+Mismatch in unused_flag: Expected = 1, Actual = 0
+lead hot bit index = 12
+case7 Mismatch in sign: Expected = 1, Actual = 0
+Mismatch in exponent: Expected = 11111111, Actual = 00100111
+Mismatch in mantissa: Expected = 00011111111111111111111, Actual = 10011101001000000000000
+Mismatch in overflow_flag: Expected = 1, Actual = 0
+answer =0010011110011101001000000000000
+Mismatch in unused_flag: Expected = 1, Actual = 0
+lead hot bit index = 14
+case8 Mismatch in sign: Expected = 1, Actual = 0
+Mismatch in exponent: Expected = 11111111, Actual = 11111110
+Mismatch in mantissa: Expected = 00011111111111111111111, Actual = 11111111111111111111111
+Mismatch in overflow_flag: Expected = 1, Actual = 0
+answer =1111111011111111111111111111111
+Mismatch in unused_flag: Expected = 1, Actual = 0
+lead hot bit index = 10
+case9 Mismatch in sign: Expected = 1, Actual = 0
+Mismatch in exponent: Expected = 11111111, Actual = 00000000
+Mismatch in mantissa: Expected = 00011111111111111111111, Actual = 11011001011000000000000
+Mismatch in overflow_flag: Expected = 1, Actual = 0
+answer =0000000011011001011000000000000
+Mismatch in unused_flag: Expected = 1, Actual = 0
+lead hot bit index = 18
+case10 Mismatch in sign: Expected = 1, Actual = 0
+Mismatch in exponent: Expected = 11111111, Actual = 01011111
+Mismatch in mantissa: Expected = 00011111111111111111111, Actual = 10010001000011111100000
+Mismatch in overflow_flag: Expected = 1, Actual = 0
+answer =0101111110010001000011111100000
+Mismatch in unused_flag: Expected = 1, Actual = 0
+lead hot bit index = 18
+case11 Mismatch in sign: Expected = 1, Actual = 0
+Mismatch in exponent: Expected = 11111111, Actual = 01100011
+Mismatch in mantissa: Expected = 00011111111111111111111, Actual = 10001001010111111100000
+Mismatch in overflow_flag: Expected = 1, Actual = 0
+answer =0110001110001001010111111100000
+Mismatch in unused_flag: Expected = 1, Actual = 0
+lead hot bit index = 18
+case12 Mismatch in sign: Expected = 1, Actual = 0
+Mismatch in exponent: Expected = 11111111, Actual = 10000111
+Mismatch in mantissa: Expected = 00011111111111111111111, Actual = 10010001100100011000000
+Mismatch in overflow_flag: Expected = 1, Actual = 0
+answer =1000011110010001100100011000000
+Mismatch in unused_flag: Expected = 1, Actual = 0
+lead hot bit index = 18
+case13 Mismatch in sign: Expected = 1, Actual = 0
+Mismatch in exponent: Expected = 11111111, Actual = 10100111
+Mismatch in mantissa: Expected = 00011111111111111111111, Actual = 10011100100110111000000
+Mismatch in overflow_flag: Expected = 1, Actual = 0
+answer =1010011110011100100110111000000
+Mismatch in unused_flag: Expected = 1, Actual = 0
+lead hot bit index = 18
+case14 Mismatch in sign: Expected = 1, Actual = 0
+Mismatch in exponent: Expected = 11111111, Actual = 10111101
+Mismatch in mantissa: Expected = 00011111111111111111111, Actual = 10010100110000111000000
+Mismatch in overflow_flag: Expected = 1, Actual = 0
+answer =1011110110010100110000111000000
+Mismatch in unused_flag: Expected = 1, Actual = 0
+lead hot bit index = 18
+case15 Mismatch in sign: Expected = 1, Actual = 0
+Mismatch in exponent: Expected = 11111111, Actual = 10111101
+Mismatch in mantissa: Expected = 00011111111111111111111, Actual = 10100001011100011000000
+Mismatch in overflow_flag: Expected = 1, Actual = 0
+answer =1011110110100001011100011000000
+Mismatch in unused_flag: Expected = 1, Actual = 0
+lead hot bit index = 14
+case16 Mismatch in sign: Expected = 1, Actual = 0
+Mismatch in exponent: Expected = 11111111, Actual = 11111101
+Mismatch in mantissa: Expected = 00011111111111111111111, Actual = 01010000011000000000000
+Mismatch in overflow_flag: Expected = 1, Actual = 0
+answer =1111110101010000011000000000000
+Mismatch in unused_flag: Expected = 1, Actual = 0
+lead hot bit index = 13
+case17 Mismatch in exponent: Expected = 11111111, Actual = 11111110
+Mismatch in mantissa: Expected = 00011111111111111111111, Actual = 11111111111111111111111
+Mismatch in overflow_flag: Expected = 1, Actual = 0
+answer =1111111011111111111111111111111
+Mismatch in unused_flag: Expected = 1, Actual = 0
+lead hot bit index = 15
+case18 Mismatch in sign: Expected = 1, Actual = 0
+Mismatch in exponent: Expected = 11111111, Actual = 00101010
+Mismatch in mantissa: Expected = 00011111111111111111111, Actual = 01101000000000100000000
+Mismatch in overflow_flag: Expected = 1, Actual = 0
+answer =0010101001101000000000100000000
+Mismatch in unused_flag: Expected = 1, Actual = 0
+lead hot bit index = 16
+case19 Mismatch in sign: Expected = 1, Actual = 0
+Mismatch in exponent: Expected = 11111111, Actual = 10011111
+Mismatch in mantissa: Expected = 00011111111111111111111, Actual = 01001101100101110000000
+Mismatch in overflow_flag: Expected = 1, Actual = 0
+answer =1001111101001101100101110000000
+Mismatch in unused_flag: Expected = 1, Actual = 0
+lead hot bit index = 16
+case20 Mismatch in sign: Expected = 1, Actual = 0
+Mismatch in exponent: Expected = 11111111, Actual = 00000000
+Mismatch in mantissa: Expected = 00011111111111111111111, Actual = 10111101001001111000000
+Mismatch in overflow_flag: Expected = 1, Actual = 0
+answer =0000000010111101001001111000000
+Mismatch in unused_flag: Expected = 1, Actual = 0
+lead hot bit index = 16
+case21 Mismatch in sign: Expected = 1, Actual = 0
+Mismatch in exponent: Expected = 11111111, Actual = 11111110
+Mismatch in mantissa: Expected = 00011111111111111111111, Actual = 11111111111111111111111
+Mismatch in overflow_flag: Expected = 1, Actual = 0
+answer =1111111011111111111111111111111
+Mismatch in unused_flag: Expected = 1, Actual = 0
+lead hot bit index = 9
+case22 Mismatch in sign: Expected = 1, Actual = 0
+Mismatch in exponent: Expected = 11111111, Actual = 11111110
+Mismatch in mantissa: Expected = 00011111111111111111111, Actual = 11111111111111111111111
+Mismatch in overflow_flag: Expected = 1, Actual = 0
+answer =1111111011111111111111111111111
+Mismatch in unused_flag: Expected = 1, Actual = 0
+lead hot bit index = 9
+case23 Mismatch in sign: Expected = 1, Actual = 0
+Mismatch in exponent: Expected = 11111111, Actual = 11111110
+Mismatch in mantissa: Expected = 00011111111111111111111, Actual = 11111111111111111111111
+Mismatch in overflow_flag: Expected = 1, Actual = 0
+answer =1111111011111111111111111111111
+Mismatch in unused_flag: Expected = 1, Actual = 0
+lead hot bit index = 9
+case24 Mismatch in sign: Expected = 1, Actual = 0
+Mismatch in exponent: Expected = 11111111, Actual = 11111110
+Mismatch in mantissa: Expected = 00011111111111111111111, Actual = 11111111111111111111111
+Mismatch in overflow_flag: Expected = 1, Actual = 0
+answer =1111111011111111111111111111111
+Mismatch in unused_flag: Expected = 1, Actual = 0
+lead hot bit index = 9
+case25 Mismatch in sign: Expected = 1, Actual = 0
+Mismatch in exponent: Expected = 11111111, Actual = 11111110
+Mismatch in mantissa: Expected = 00011111111111111111111, Actual = 11111111111111111111111
+Mismatch in overflow_flag: Expected = 1, Actual = 0
+answer =1111111011111111111111111111111
+Mismatch in unused_flag: Expected = 1, Actual = 0
+lead hot bit index = 9
+case26 Mismatch in sign: Expected = 1, Actual = 0
+Mismatch in exponent: Expected = 11111111, Actual = 11111110
+Mismatch in mantissa: Expected = 00011111111111111111111, Actual = 11111111111111111111111
+Mismatch in overflow_flag: Expected = 1, Actual = 0
+answer =1111111011111111111111111111111
+Mismatch in unused_flag: Expected = 1, Actual = 0
+case26 Mismatch in sign: Expected = 1, Actual = 0
+Mismatch in exponent: Expected = 11111111, Actual = 11111110
+Mismatch in mantissa: Expected = 00011111111111111111111, Actual = 11111111111111111111111
+Mismatch in overflow_flag: Expected = 1, Actual = 0
+answer =1111111011111111111111111111111
+Mismatch in unused_flag: Expected = 1, Actual = 0
+lead hot bit index = 18
+case27 Mismatch in sign: Expected = 1, Actual = 0
+Mismatch in exponent: Expected = 11111111, Actual = 10000111
+Mismatch in mantissa: Expected = 00011111111111111111111, Actual = 11011000111100111000000
+Mismatch in overflow_flag: Expected = 1, Actual = 0
+answer =1000011111011000111100111000000
+Mismatch in unused_flag: Expected = 1, Actual = 0
+lead hot bit index = 18
+case28 Mismatch in sign: Expected = 1, Actual = 0
+Mismatch in exponent: Expected = 11111111, Actual = 01111111
+Mismatch in mantissa: Expected = 00011111111111111111111, Actual = 11010110100000011100000
+Mismatch in overflow_flag: Expected = 1, Actual = 0
+answer =0111111111010110100000011100000
+Mismatch in unused_flag: Expected = 1, Actual = 0
+lead hot bit index = 18
+case29 Mismatch in sign: Expected = 1, Actual = 0
+Mismatch in exponent: Expected = 11111111, Actual = 01111111
+Mismatch in mantissa: Expected = 00011111111111111111111, Actual = 11010101011011010000000
+Mismatch in overflow_flag: Expected = 1, Actual = 0
+answer =0111111111010101011011010000000
+Mismatch in unused_flag: Expected = 1, Actual = 0
+case29 Mismatch in sign: Expected = 1, Actual = 0
+Mismatch in exponent: Expected = 11111111, Actual = 01111111
+Mismatch in mantissa: Expected = 00011111111111111111111, Actual = 11010101011011010000000
+Mismatch in overflow_flag: Expected = 1, Actual = 0
+answer =0111111111010101011011010000000
+Mismatch in unused_flag: Expected = 1, Actual = 0
+lead hot bit index = 18
+case30 Mismatch in sign: Expected = 1, Actual = 0
+Mismatch in exponent: Expected = 11111111, Actual = 10010101
+Mismatch in mantissa: Expected = 00011111111111111111111, Actual = 11100000000111001000000
+Mismatch in overflow_flag: Expected = 1, Actual = 0
+answer =1001010111100000000111001000000
+Mismatch in unused_flag: Expected = 1, Actual = 0
+lead hot bit index = 18
+case31 Mismatch in sign: Expected = 1, Actual = 0
+Mismatch in exponent: Expected = 11111111, Actual = 10010111
+Mismatch in mantissa: Expected = 00011111111111111111111, Actual = 11011111101000000000000
+Mismatch in overflow_flag: Expected = 1, Actual = 0
+answer =1001011111011111101000000000000
+Mismatch in unused_flag: Expected = 1, Actual = 0
+lead hot bit index = 18
+case32 Mismatch in sign: Expected = 1, Actual = 0
+Mismatch in exponent: Expected = 11111111, Actual = 10010001
+Mismatch in mantissa: Expected = 00011111111111111111111, Actual = 11100011001011001100000
+Mismatch in overflow_flag: Expected = 1, Actual = 0
+answer =1001000111100011001011001100000
+Mismatch in unused_flag: Expected = 1, Actual = 0

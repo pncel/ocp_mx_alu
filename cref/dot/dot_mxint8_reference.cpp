@@ -9,41 +9,42 @@
 
 using namespace std;
 
-FP32_ieee754 mx_dot(MXINT8_vector a, MXINT8_vector b);
-FP32_ieee754 to_FP32(int32_t MXINT8_sum_result, int32_t shared_scale);
+// FP32_ieee754 mxint8_dot_reference(MXINT8_vector a, MXINT8_vector b);
+// FP32_ieee754 to_FP32(int32_t MXINT8_sum_result, int32_t shared_scale);
 
-int main() {
+// int main() {
     
-    MXINT8_vector a, b;
-    a.scale = 140;  // Set the 8-bit field (max value for 8 bits)
-    b.scale = 132;
+//     MXINT8_vector a, b;
+//     a.scale = 140;  // Set the 8-bit field (max value for 8 bits)
+//     b.scale = 132;
     
-    // Fill the array with values
-    for (int i = 0; i < 32; ++i) {
-        a.elements[i] = i % 256;  // Example values, ensuring they fit in 8 bits
-        b.elements[i] = i % 256;
-        std::cout << "diff: " << + a.elements[i].to_ulong() << std::endl;
-    }
-    std::cout << "" << + a.scale.to_ulong() << std::endl;
-    FP32_ieee754 y = mx_dot(a,b);
-    // Access result
-    std::cout << "mx_dot FP32 result: " << std::endl;
-    std::cout << "S: " << y.sign << std::endl;
-    std::cout << "E: " << y.exponent << std::endl;
-    std::cout << "M: " << y.mantissa << std::endl;
+//     // Fill the array with values
+//     for (int i = 0; i < 32; ++i) {
+//         a.elements[i] = i % 256;  // Example values, ensuring they fit in 8 bits
+//         b.elements[i] = i % 256;
+//         std::cout << "diff: " << + a.elements[i].to_ulong() << std::endl;
+//     }
+//     std::cout << "" << + a.scale.to_ulong() << std::endl;
+//     FP32_ieee754 y = mxint8_dot_reference(a,b);
+//     // Access result
+//     std::cout << "mx_dot FP32 result: " << std::endl;
+//     std::cout << "S: " << y.sign << std::endl;
+//     std::cout << "E: " << y.exponent << std::endl;
+//     std::cout << "M: " << y.mantissa << std::endl;
     
 
-    return 0;
-}
+//     return 0;
+// }
 
-FP32_ieee754 mx_dot(MXINT8_vector a, MXINT8_vector b) {
+FP32_ieee754 dot_mxint8_reference(MXINT8_vector a, MXINT8_vector b) {
     // TODO zero case: determine what to do
     // TODO NaN case: determine what to do
+    // TODO unused case: determine what to do
 
     // Multiply the block scales (X) through adding the scale factors bits after applying bias; 
     // Add because scale bits encode X through 2^(scale_int - 127); need 9 bits
     int32_t new_scale = ((static_cast<int32_t>(a.scale.to_ulong())-127) + (static_cast<int32_t>(b.scale.to_ulong())-127)) + 127;
-    std::cout << "new scale " << new_scale << std::endl;
+    // std::cout << "new scale " << new_scale << std::endl;
 
     // scale overflow managed in helper function
     
@@ -55,8 +56,8 @@ FP32_ieee754 mx_dot(MXINT8_vector a, MXINT8_vector b) {
         int32_t operand_b = b.elements[i][7] ? b.elements[i].to_ulong() - 256 : b.elements[i].to_ulong(); 
         sum_of_products += operand_a * operand_b;
     }
-    cout << "\n" <<"Intermediate Dot Product Result (extended mxint8 element) " << std::bitset<32> {abs(sum_of_products)} << endl;
-    cout << "\n" <<"Absolute Value " << std::bitset<32> {abs(sum_of_products)} << endl;
+    // cout << "\n" <<"Intermediate Dot Product Result (extended mxint8 element) " << std::bitset<32> {abs(sum_of_products)} << endl;
+    // cout << "\n" <<"Absolute Value " << std::bitset<32> {abs(sum_of_products)} << endl;
     // fit into FP32 (IEEE754) representation, clamp if too large
     return to_FP32(sum_of_products, new_scale);
     //return
@@ -93,7 +94,7 @@ FP32_ieee754 to_FP32(int32_t MXINT8_sum_result, int32_t shared_scale){
         }
         //overflow -> clamp
         else {
-            FP32_sum_result.mantissa = FP32_MAX_MANTISSA;
+            FP32_sum_result.mantissa = FP32_MAX_MANTISSA; // RTL throw OVERFLOW
             FP32_sum_result.exponent = FP32_MAX_EXPONENT;
         }
     }
