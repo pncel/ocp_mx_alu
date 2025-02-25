@@ -7,7 +7,7 @@ preliminary designs
 
 | function                      | C++ model |Verilog | Testbench    |
 | --------                      | -------   |------- | -------- |
-| add (vector)                  | ✅       | ❌     | ❌     |
+| add (vector)                  | ✅       | ✏️     | ❌     |
 | subtract (vector)             | ❌       | ❌     | ❌     |
 | multiply (vector)             | ❌       | ❌     | ❌     |
 | divide (vector) (optional)    | ❌       | ❌     | ❌     |
