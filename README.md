@@ -7,15 +7,15 @@ preliminary designs
 
 | function                      | C++ model |Verilog | Testbench    |
 | --------                      | -------   |------- | -------- |
-| add (vector)                  | ✏️       | ❌     | ❌     |
-| subtract (vector)             | ✏️       | ❌     | ❌     |
+| add (vector)                  | ✅       | ❌     | ❌     |
+| subtract (vector)             | ❌       | ❌     | ❌     |
 | multiply (vector)             | ❌       | ❌     | ❌     |
 | divide (vector) (optional)    | ❌       | ❌     | ❌     |
-| dot product (vector)    | ❌       | ❌     | ❌     |
+| dot product (vector)    | ✅       | ✏️     | ✏️     |
 | broadcast (scalar -> vector)  | 😐       | ✅     | ✅     |
 | conversion vector(fp32 -> mxint8) | ❌       | ❌     | ❌     |
 | conversion vector(mxint8 -> fp32) | ❌       | ❌     | ❌     |
-| sum (vector -> scalar)        | 😐       | 🤔 (needs peer review)     | ✅     |
+| sum (vector -> scalar)        | ✅       | ✅      | ✅     |
 | negate (vector -> vector)     | 😐       | ✅     | ✅     |
 ###### (😐=NA, 🤔=UNSURE, ✏️=WIP, ❌=TODO, ✅=DONE)
 
