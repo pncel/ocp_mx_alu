@@ -10,7 +10,7 @@ TB_FILES =  $(TB_DIR)/mx_int8_sum_mon.sv \
 			$(TB_DIR)/mx_int8_sum_drv.sv \
 			$(TB_DIR)/tb_mx_int8_sum.sv \
 			$(TB_DIR)/mx_int8_sum_ref.sv
-HIGH_TB_FILES = $(HIGH_TB_DIR)/transection.sv
+HIGH_TB_FILES = $(HIGH_TB_DIR)/transaction.sv
 all: compile simulation
 # Compile target
 compile:

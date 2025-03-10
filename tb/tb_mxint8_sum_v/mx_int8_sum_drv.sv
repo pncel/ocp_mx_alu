@@ -5,17 +5,20 @@ module mx_int8_sum_drv #(
     )(
     scale_drv,
     mxint8_elements_drv,
+    float32_sum_drv,
     clk
 );
     localparam int half = CYCLE/2; 
+    parameter string FILENAME = "testcase.txt"; // Default to test.txt
     `include "scalar_includes.v"
     `include "mxint8_includes.v"
     input  wire clk;
-    output wire[`SCALE_WIDTH-1:0]            scale_drv;
-    output wire[`MXINT8_ELEMENT_WIDTH-1:0]   mxint8_elements_drv [`BLOCK_SIZE-1:0];
+    output reg[`SCALE_WIDTH-1:0]            scale_drv;
+    output reg[`MXINT8_ELEMENT_WIDTH-1:0]   mxint8_elements_drv [`BLOCK_SIZE-1:0];
+    output reg[`FLOAT32_WIDTH-1:0]          float32_sum_drv;
+    output reg                              unused_flag_drv;
+    output reg                              overflow_flag_drv;
 
-    t_mx_int8_vector vector_in(.scale(scale_drv),
-                               .elements(mxint8_elements_drv));
     /*
     assign scale_drv = vector_in.scale;
     genvar i;
@@ -23,221 +26,124 @@ module mx_int8_sum_drv #(
         for(i = 0 ; i < `BLOCK_SIZE; i = i+1)
             assign mxint8_elements_drv[i]  = vector_in.elements[i];
     endgenerate*/
-    
+    // Include your common definitions
+    `include "scalar_includes.v"
+    `include "mxint8_includes.v"
+
+    // Instantiate the test vector class so its internal
+    // fields will drive the outputs
+    // t_mx_int8_vector vector_in (
+    //     .scale   (scale_drv),
+    //     .elements(mxint8_elements_drv)
+    // );
+
+    // [Optionally comment out or remove all random test generator functions]
+    /*
     function void normal_case();
         vector_in.randomize();
     endfunction
-    function void positive_case();
-        vector_in.randomize();
-        vector_in.set_all_positive();
-    endfunction
-    function void negative_case();
-        vector_in.set_all_negative();
-    endfunction
-    function void small_case();
-        vector_in.randomize();
-        vector_in.set_all_small_elements();
-    endfunction
-    function void big_case();
-        vector_in.randomize();
-        vector_in.set_all_big_elements();
-    endfunction
-    function void all_zero_case();
-        vector_in.randomize();
-        vector_in.set_all_zero();
-    endfunction
-    function void single_zero_case();
-        vector_in.randomize();
-        vector_in.set_zero($random() % `BLOCK_SIZE);
-    endfunction
-    function void all_nan_case();
-        vector_in.randomize();
-        vector_in.set_all_unused_code();
-    endfunction
-    function void single_nan_case();
-        vector_in.randomize();
-        vector_in.set_unused_encode($random() % `BLOCK_SIZE);
-    endfunction
+    ...
+    */
 
-    function void positive_carry_case_p(int big_positive_num, int is_small_scale);
-        vector_in.randomize();
-        vector_in.set_sum_positive_carry(big_positive_num,is_small_scale);//no overflow
-    endfunction
-    function void positive_carry_case();
-        positive_carry_case_p(10,20);
-    endfunction
-    function void positive_overflow_case();
-        positive_carry_case_p(20,2);
-    endfunction
-    function void positive_overflow_max_case();
-        positive_carry_case_p(`BLOCK_SIZE,1);
-    endfunction
-    function void positive_overflow_scale_nan();
-        positive_carry_case_p(11,0);
-    endfunction
-    function void positive_carry_max_case();
-        positive_carry_case_p(`BLOCK_SIZE,100);
-    endfunction
+    // Remove or comment-out your old initial block that called normal_case(), etc.
+    // initial begin
+    //     $display("normal_case");
+    //     repeat(5*N) @(posedge clk) normal_case();
+    //     ...
+    //     $finish();
+    // end
 
-    function void negative_carry_case_p(int big_positive_num, int is_small_scale);
-        vector_in.randomize();
-        vector_in.set_sum_negative_carry(big_positive_num,is_small_scale);//no overflow
-    endfunction
-    function void negative_carry_case();
-        negative_carry_case_p(15,40);
-    endfunction
-    function void negative_overflow_case();
-        negative_carry_case_p(25,3);
-    endfunction
-    function void negative_overflow_max_case();
-        negative_carry_case_p(`BLOCK_SIZE,1);
-    endfunction
-    function void negative_overflow_scale_nan();
-        negative_carry_case_p(21,0);
-    endfunction
-    function void negative_carry_max_case();
-        negative_carry_case_p(`BLOCK_SIZE,120);
-    endfunction
-
-    function void scale_nan_case();
-        vector_in.randomize();
-        vector_in.set_largest_scale();
-    endfunction
-    function void scale_nan_unusedcode_case();
-        vector_in.randomize();
-        vector_in.set_largest_scale();
-        vector_in.set_unused_encode($random() % `BLOCK_SIZE);
-    endfunction
-
+    // -----------------------------------------------------------------------
+    // NEW INITIAL BLOCK TO READ FROM TEXT FILE
+    // -----------------------------------------------------------------------
+    
     initial begin
         
-        $display("normal_case");
-        repeat(5*N) begin
-            @(posedge clk) begin
-                normal_case();
-            end
-        end 
-        
-        #(half+1) $display("all positive number case");
-        repeat(N) begin
-            @(posedge clk) begin
-                positive_case();
-            end
+        // Variables for file I/O
+        int file_descriptor;
+        reg [1023:0] one_line;
+        reg [`FLOAT32_WIDTH-1:0] f32_value;
+        int case_number;
+        int index;
+        int value;
+        int scale_value;
+        int status;
+        int valid_line;
+        int unused_flag;
+        int overflow_flag;
+        #half;
+        #half;
+        // Attempt to open the text file
+        file_descriptor = $fopen(FILENAME, "r");
+        if (file_descriptor == 0) begin
+            $display("ERROR: Could not open file '%0s'", FILENAME);
+            $finish;
         end
-        #(half+1) $display("all negative number case");
-        repeat(N) begin
-            @(posedge clk) begin
-                negative_case();
+
+        // Read until we hit the end of file
+        while (!$feof(file_descriptor)) begin
+            // Read a line
+            status = $fgets(one_line, file_descriptor);
+            if (status == 0) begin
+                $display("ERROR: Unexpected EOF while reading file");
+                $finish;
             end
-        end
-        #(half+1) $display("all small absolute value int8 case");
-        repeat(N) begin
-            @(posedge clk) begin
-                small_case();
+
+            // Initialize valid_line flag
+            valid_line = 0;
+
+            // Check if the line is "Case = %d"
+            if ($sscanf(one_line, "Case = %d", case_number) == 1) begin
+                $display("Reading case = %0d", case_number);
+                valid_line = 1; // Mark line as valid
             end
-        end
-        #(half+1) $display("all big absolute value int8 case");
-        repeat(N) begin
-            @(posedge clk) begin
-                big_case();
+
+            // Check if the line is "element[%d] = %d"
+            if ($sscanf(one_line, "element[%d] = %d", index, value) == 2) begin
+                if (index >= `BLOCK_SIZE) begin
+                    $display("ERROR: Invalid index %0d in line: '%0s'", index, one_line);
+                    $finish;
+                end
+                mxint8_elements_drv[index] = value; // Assign to reg
+                $display("element[%d] = %d",  index, mxint8_elements_drv[index]);
+                valid_line = 1; // Mark line as valid
             end
-        end
-        #(half+1) $display("all zero value case");
-        repeat(N) begin
-            @(posedge clk) begin
-                all_zero_case();
+
+            // Check if the line is "scale = %d"
+            if ($sscanf(one_line, "scale = %d", scale_value) == 1) begin
+                scale_drv = scale_value; // Assign to reg
+                $display("scale = %d", scale_drv);
+                valid_line = 1; // Mark line as valid
+                // @(posedge clk); // Wait for clock edge after processing scale
             end
-        end
-        #(half+1) $display("1 random 0 case");
-        repeat(N) begin
-            @(posedge clk) begin
-                single_zero_case();
+
+            if ($sscanf(one_line, "expected result = %b", f32_value) == 1) begin
+                float32_sum_drv = f32_value; // Assign to reg
+                $display("expected result = %b", float32_sum_drv);
+                valid_line = 1; // Mark line as valid
             end
-        end
-        #(half+1) $display("all int8 1000_0000 case");
-        repeat(N) begin
-            @(posedge clk) begin
-                all_nan_case();
+
+            if ($sscanf(one_line, "overflow flag = %b", overflow_flag) == 1) begin
+                overflow_flag_drv = overflow_flag; // Assign to reg
+                $display("overflow flag = %b", overflow_flag);
+                valid_line = 1; // Mark line as valid
             end
-        end
-        #(half+1) $display("1 int8 1000_0000 case");
-        repeat(N) begin
-            @(posedge clk) begin
-                single_nan_case();
+            if ($sscanf(one_line, "unused flag = %b", unused_flag) == 1) begin
+                unused_flag_drv = unused_flag; // Assign to reg
+                $display("unused flag = %b", unused_flag);
+                valid_line = 1; // Mark line as valid
+                @(posedge clk); // Wait for clock edge after processing scale
             end
+            // If the line is not valid, skip or report an error
+            // if (!valid_line) begin
+            //     // $display("WARNING: Unrecognized line: '%0s'", one_line);
+            // end
         end
-        #(half+1) $display("positive carry case");
-        repeat(N) begin
-            @(posedge clk) begin
-                positive_carry_case();
-            end
-        end
-        #(half+1) $display("lagest positive carry");
-        repeat(N) begin
-            @(posedge clk) begin
-                positive_carry_max_case();
-            end
-        end
-        #(half+1) $display("positive number overflow");
-        repeat(N) begin
-            @(posedge clk) begin
-                positive_overflow_case();
-            end
-        end
-        #(half+1) $display("positive overflow with largest carry");
-        repeat(N) begin
-            @(posedge clk) begin
-                positive_overflow_max_case();
-            end
-        end
-        #(half+1) $display("positive overflow with int8 1000_0000");
-        repeat(N) begin
-            @(posedge clk) begin
-                positive_overflow_scale_nan();
-            end
-        end
-    #(half+1) $display("negative carry case");
-        repeat(N) begin
-            @(posedge clk) begin
-                negative_carry_case();
-            end
-        end
-        #(half+1) $display("lagest negative carry");
-        repeat(N) begin
-            @(posedge clk) begin
-                negative_carry_max_case();
-            end
-        end
-        #(half+1) $display("negative number overflow");
-        repeat(N) begin
-            @(posedge clk) begin
-                negative_overflow_case();
-            end
-        end
-        #(half+1) $display("negative overflow with largest carry");
-        repeat(N) begin
-            @(posedge clk) begin
-                negative_overflow_max_case();
-            end
-        end
-        #(half+1) $display("negative overflow with int8 1000_0000");
-        repeat(N) begin
-            @(posedge clk) begin
-                negative_overflow_scale_nan();
-            end
-        end
-        #(half+1) $display("scale 1111_1111 nan case");
-        repeat(N) begin
-            @(posedge clk) begin
-                scale_nan_case();
-            end
-        end
-        #(half+1) $display("scale 1111_1111 and int8 have 1000_0000 case");
-        repeat(N) begin
-            @(posedge clk) begin
-                scale_nan_unusedcode_case();
-            end
-        end
+
+        // Close the file
+        $fclose(file_descriptor);
+
+        $display("All testcases from '%0s' have been driven. Finishing...", FILENAME);
         $finish();
-    end
+    end // initial
 endmodule 

@@ -6,6 +6,7 @@ module mx_int8_sum_mon(
     i_overflow_dut,
     i_float32_ref,
     i_overflow_ref,
+    i_is_unused,
     clk
 );
     `include "scalar_includes.v"
@@ -19,7 +20,7 @@ module mx_int8_sum_mon(
     input  reg                               i_overflow_ref;
     input  reg [`FLOAT32_WIDTH-1:0]          i_float32_dut;
     input  reg                               i_overflow_dut;
-    
+    input  reg                               i_is_unused;
     reg [`FLOAT32_WIDTH-1:0]         float32_conv;/*
     reg  [`SCALE_WIDTH-1:0]           o_scale_conv;
     reg  [`MXINT8_ELEMENT_WIDTH-1:0]  o_mxint8_elements_conv [`BLOCK_SIZE-1:0];
@@ -30,23 +31,24 @@ module mx_int8_sum_mon(
         .o_mxint8_elements(o_mxint8_elements_conv)
     );*/ //if need int8 sum
 
-    int transection_id; 
+    int transaction_id; 
 
     initial begin
-        transection_id = 0; 
+        transaction_id = 0; 
     end
-    //check and output part in each transection 
-    always @(negedge clk) begin : single_transection 
-        $display("\ntransection id: %d",transection_id);
-        float32_conv = print_input_vector();
+    //check and output part in each transaction 
+    always @(negedge clk) begin : single_transaction 
+        $display("\ntransaction id: %d",transaction_id);
+        // float32_conv = print_input_vector();
         #1;
-        $display("%b    :REF FP32 SUM OUT",float32_conv);
-        //print_dut_out();
-        //print_ref_out();
-        /*
-        if(float32_conv != i_float32_ref)
-            $display("ERROR case.");*/
-        transection_id <= transection_id + 1; 
+        // $display("%b    :REF FP32 SUM OUT",float32_conv);
+        //check the result
+        print_dut_out();
+        print_ref_out();
+        
+        if(i_float32_dut != i_float32_ref)
+            $display("ERROR case.");
+        transaction_id <= transaction_id + 1; 
     end
 
     function void print_dut_out();
@@ -55,58 +57,60 @@ module mx_int8_sum_mon(
     function void print_ref_out();
         $display("FP32 REF SUM OUTPUT:\n%b   %f", i_float32_ref,i_float32_ref);
     endfunction
-    function reg[`FLOAT32_WIDTH-1:0] print_input_vector();
-        shortreal scale_r;
-        shortreal scale_dec;
-        shortreal mantissa_sum;
-        shortreal mantissa_sum_raw;
-        shortreal mantissa_sum_dec;
-        int ceil_sum;
-        bit overflow; 
-        int carry_num;
-        reg [`SCALE_WIDTH-1:0]  scale_E8;
-        int carry_neg;
-        shortreal ideal_sum;
-        reg [63:0] ideal_sum_bin;
-        //shortreal elements [`BLOCK_SIZE-1:0];
+//     function reg[`FLOAT32_WIDTH-1:0] print_input_vector();
+//         shortreal scale_r;
+//         shortreal scale_dec;
+//         shortreal mantissa_sum;
+//         shortreal mantissa_sum_raw;
+//         shortreal mantissa_sum_dec;
+//         int ceil_sum;
+//         bit overflow; 
+//         int carry_num;
+//         reg [`SCALE_WIDTH-1:0]  scale_E8;
+//         int carry_neg;
+//         shortreal ideal_sum;
+//         reg [63:0] ideal_sum_bin;
+//         //shortreal elements [`BLOCK_SIZE-1:0];
 
-        mantissa_sum = 0.0;
-        scale_r = scale_to_shortreal(i_scale); 
-        overflow = is_overflow(scale_r);
-        scale_dec = $pow(2.0,scale_r); //$pow(x,y) = x**y LRM 20.8.2 is for real. shortreal also work
-        $display("INPUT DATA: \nscale:\n%b   %f\n%f    NaN: %b",i_scale,scale_r,scale_dec,overflow);
-        $display("elements:");
-        for(int i = 0; i < `BLOCK_SIZE; i = i + 1) begin
-            shortreal element_r;
-            element_r = INT8_to_shortreal(i_mxint8_elements[i]);
-            mantissa_sum += element_r;
-            $display("%b ,  %f  ,  %f",i_mxint8_elements[i],element_r,scale_dec*element_r);
-        end
-        carry_neg = 0;
-        mantissa_sum_raw = mantissa_sum;
-        while(abs_shortreal(mantissa_sum) <= 0.9921875 && mantissa_sum != 0.0) begin //for higher precision ? (1 63/64) / 2
-            mantissa_sum *= 2.0;
-            carry_neg += 1;
-        end
-        ceil_sum = shortreal_ceil_to_int(mantissa_sum);
-        carry_num = $clog2(abs_int(ceil_sum)) - 1;
-        carry_num -= carry_neg;
-        scale_r += itoshortreal(carry_num); //no int to shortreal conversion function
+//         mantissa_sum = 0.0;
+//         scale_r = scale_to_shortreal(i_scale); 
+//         overflow = is_overflow(scale_r);
+//         scale_dec = $pow(2.0,scale_r); //$pow(x,y) = x**y LRM 20.8.2 is for real. shortreal also work
+//         $display("INPUT DATA: \nscale:\n%b   %f\n%f    NaN: %b",i_scale,scale_r,scale_dec,overflow);
+//         $display("elements:");
+//         for(int i = 0; i < `BLOCK_SIZE; i = i + 1) begin
+//             shortreal element_r;
+//             element_r = INT8_to_shortreal(i_mxint8_elements[i]);
+//             mantissa_sum += element_r;
+//             $display("%b ,  %f  ,  %f",i_mxint8_elements[i],element_r,scale_dec*element_r);
+//         end
+//         carry_neg = 0;
+//         mantissa_sum_raw = mantissa_sum;
+//         while(abs_shortreal(mantissa_sum) <= 0.9921875 && mantissa_sum != 0.0) begin //for higher precision ? (1 63/64) / 2
+//             mantissa_sum *= 2.0;
+//             carry_neg += 1;
+//         end
+//         ceil_sum = shortreal_ceil_to_int(mantissa_sum);
+//         carry_num = $clog2(abs_int(ceil_sum)) - 1;
+//         carry_num -= carry_neg;
+//         scale_r += itoshortreal(carry_num); //no int to shortreal conversion function
         
-        scale_E8 = i_scale + carry_num;
-        overflow = is_overflow(scale_r);
-        scale_dec = $pow(2.0,scale_r); 
+//         scale_E8 = i_scale + carry_num;
+//         overflow = is_overflow(scale_r);
+//         scale_dec = $pow(2.0,scale_r); 
 
-//MODIFY  Add subnormal region treatment method
-        mantissa_sum_dec = shortreal_shift(mantissa_sum,-1.0 * (carry_num + carry_neg));
+// //MODIFY  Add subnormal region treatment method
+//         mantissa_sum_dec = shortreal_shift(mantissa_sum,-1.0 * (carry_num + carry_neg));
 
-        ideal_sum = mantissa_sum*scale_dec;
-        $display("%e  ideal sum. %b:NaN  %f:raw sum dec",ideal_sum,overflow,mantissa_sum_raw);
-        $display("%b  :scale,  %f:mantissa_dec_ideal,  %f:scale,  %d:carry_num",scale_E8,mantissa_sum_dec,scale_r,carry_num);
-        return ideal_sum;
-        //return $shortrealtobits(ideal_sum); //20.5 LRM conversion function 
+//         ideal_sum = mantissa_sum*scale_dec;
+//         //ideal sum is wrong
+//         $display("%e  ideal sum. %b:NaN  %f:raw sum dec",ideal_sum,overflow,mantissa_sum_raw);
+//         $display("%b  :scale,  %f:mantissa_dec_ideal,  %f:scale,  %d:carry_num",scale_E8,mantissa_sum_dec,scale_r,carry_num);
+//         $display("i_is_unused: ",i_is_unused);
+//         return ideal_sum;
+//         //return $shortrealtobits(ideal_sum); //20.5 LRM conversion function 
         
-    endfunction
+//     endfunction
     function automatic shortreal shortreal_shift(shortreal data, int shift_num); 
         while(shift_num != 0) begin
             if(shift_num > 0) begin
