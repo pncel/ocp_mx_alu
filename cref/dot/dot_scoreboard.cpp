@@ -116,7 +116,8 @@ void processFile_and_answer(const string& fileName) {
                     cout << "PASS: S_E_M: " << actual_result.sign << "_" << actual_result.exponent << "_" << actual_result.mantissa << "; ";
                     cout << "flags underflow_overflow_unused: " << actual_result.underflow_flag << actual_result.overflow_flag << actual_result.unused_flag << endl;
             } else {
-                cout << "FAIL:" << endl;
+                cout << "FAIL: S_E_M: " << actual_result.sign << "_" << actual_result.exponent << "_" << actual_result.mantissa << "; ";
+                cout << "flags underflow_overflow_unused: " << actual_result.underflow_flag << actual_result.overflow_flag << actual_result.unused_flag << endl;
                 if (expected_result.sign != actual_result.sign) {
                     cout << "   Mismatch in sign: "
                         << "Expected = " << expected_result.sign << ", Actual = " << actual_result.sign << endl;

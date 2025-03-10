@@ -63,9 +63,9 @@ MXINT8_vector subnormal_edge() { //1*2**-126
     MXINT8_vector testcase;
     
     for (int i = 0; i < 32; i++) {
-        testcase.elements[i] = bitset<8>(rand() % 9 - 9 ); //[-127 ~ 27]
+        testcase.elements[i] = bitset<8>(rand() % 3 - 3 ); //[-3 ~ -1]
     }
-    testcase.scale = rand() % 8 ;
+    testcase.scale = rand() % 2 ;
     return testcase;
 }
 
@@ -85,6 +85,26 @@ MXINT8_vector negative_overflow() {
         testcase.elements[i] = bitset<8>(rand() % 7 - 127 );
     }
     testcase.scale = rand() % 4 + 250 ;
+    return testcase;
+}
+
+MXINT8_vector gen_ones() { 
+    MXINT8_vector testcase;
+    
+    for (int i = 0; i < 32; i++) {
+        testcase.elements[i] = 1;
+    }
+    testcase.scale = 127 ;
+    return testcase;
+}
+
+MXINT8_vector gen_zeros() { 
+    MXINT8_vector testcase;
+    
+    for (int i = 0; i < 32; i++) {
+        testcase.elements[i] = 0;
+    }
+    testcase.scale = 0;
     return testcase;
 }
 // MXINT8_vector Small_Cases() {
@@ -113,10 +133,10 @@ void publish_testcase_2vec(MXINT8_vector testcase_A, MXINT8_vector testcase_B) {
     
     cout << "scale_A = " << testcase_A.scale.to_ulong() << endl;
     cout << "scale_B = " << testcase_B.scale.to_ulong() << endl;
-    cout << "expected result = " << "11111111111111111111111111111" << endl;
-    cout << "unused flag = " << "11111111111111111111111111111" << endl;
-    cout << "underflow flag = " << "11111111111111111111111111111" << endl;
-    cout << "overflow flag = " << "11111111111111111111111111111" << endl;
+    cout << "expected result = " << endl;
+    cout << "unused flag = " << endl;
+    cout << "underflow flag = " << endl;
+    cout << "overflow flag = " << endl;
 }
 
 int main(){
@@ -171,7 +191,7 @@ int main(){
     }
 
 
-    cout << "\nsmall_scale__elements" <<endl;
+    cout << "\nsmall_scale_elements_UNDERFLOW" <<endl;
     for(int i = 0; i<3; i++){
         cout << "\nCase = " << case_cnt << endl;
         vector_A = small_scale__elements();
@@ -181,17 +201,17 @@ int main(){
     }
 
 
-    cout << "\nsubnormal_edge" <<endl;
+    cout << "\nsubnormal edge" <<endl;
     for(int i = 0; i<5; i++){
         cout << "\nCase = " << case_cnt << endl;
         vector_A = subnormal_edge();
-        vector_B = subnormal_edge();
+        vector_B = gen_ones();
         publish_testcase_2vec(vector_A, vector_B);
         case_cnt ++;
     }
 
 
-    cout << "\npositive_overflow" <<endl;
+    cout << "\npositive_OVERFLOW" <<endl;
     for(int i = 0; i<3; i++){
         cout << "\nCase = " << case_cnt << endl;
         vector_A = positive_overflow();
@@ -201,11 +221,11 @@ int main(){
     }
 
 
-    cout << "\nnegative_overflow" <<endl;
+    cout << "\nnegative_OVERFLOW" <<endl;
     for(int i = 0; i<3; i++){
         cout << "\nCase = " << case_cnt << endl;
         vector_A = negative_overflow();
-        vector_B = negative_overflow();
+        vector_B = positive_overflow();
         publish_testcase_2vec(vector_A, vector_B);
         case_cnt ++;
     }

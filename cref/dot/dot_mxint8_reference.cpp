@@ -8,38 +8,13 @@
 #include <cmath>
 
 using namespace std;
+template<size_t N, size_t M>
+std::bitset<M> bitset_slice(const std::bitset<N>& b, size_t start, size_t length);
 
-// FP32_ieee754 mxint8_dot_reference(MXINT8_vector a, MXINT8_vector b);
-// FP32_ieee754 to_FP32(int32_t MXINT8_sum_result, int32_t shared_scale);
-
-// int main() {
-    
-//     MXINT8_vector a, b;
-//     a.scale = 140;  // Set the 8-bit field (max value for 8 bits)
-//     b.scale = 132;
-    
-//     // Fill the array with values
-//     for (int i = 0; i < 32; ++i) {
-//         a.elements[i] = i % 256;  // Example values, ensuring they fit in 8 bits
-//         b.elements[i] = i % 256;
-//         std::cout << "diff: " << + a.elements[i].to_ulong() << std::endl;
-//     }
-//     std::cout << "" << + a.scale.to_ulong() << std::endl;
-//     FP32_ieee754 y = mxint8_dot_reference(a,b);
-//     // Access result
-//     std::cout << "mx_dot FP32 result: " << std::endl;
-//     std::cout << "S: " << y.sign << std::endl;
-//     std::cout << "E: " << y.exponent << std::endl;
-//     std::cout << "M: " << y.mantissa << std::endl;
-    
-
-//     return 0;
-// }
 
 FP32_ieee754 dot_mxint8_reference(MXINT8_vector a, MXINT8_vector b) {
     // TODO zero case: determine what to do
     // TODO NaN case: determine what to do
-    // TODO unused case: determine what to do
 
     // Multiply the block scales (X) through adding the scale factors bits after applying bias; 
     // Add because scale bits encode X through 2^(scale_int - 127); need 9 bits
@@ -68,6 +43,17 @@ FP32_ieee754 dot_mxint8_reference(MXINT8_vector a, MXINT8_vector b) {
     //return
 }
 
+// perplexity bitset from slice of larger bitset
+template<size_t N, size_t M>
+std::bitset<M> bitset_slice(const std::bitset<N>& b, size_t start, size_t length) {
+    assert(start + length <= N);
+    std::bitset<M> result;
+    for (size_t i = 0; i < length; ++i) {
+        result[i] = b[start + i];
+    }
+    return result;
+}
+
 // modified from Leo's sum reference model
 FP32_ieee754 to_FP32(int32_t MXINT8_sum_result, int32_t shared_scale){
 
@@ -87,7 +73,6 @@ FP32_ieee754 to_FP32(int32_t MXINT8_sum_result, int32_t shared_scale){
     FP32_sum_result.sign = (MXINT8_sum_result >= 0) ? 0 : 1;
     MXINT8_sum_result = abs(MXINT8_sum_result); // magnitude only
 
-    // cout << "\n" <<"MXINT8_sum_result = " << std::bitset<32> {MXINT8_sum_result} << endl;
     //*************************normal case*************************
 
     //check how many bits MXINT8_sum_result has and shift accordingly
@@ -101,8 +86,10 @@ FP32_ieee754 to_FP32(int32_t MXINT8_sum_result, int32_t shared_scale){
 
         if(shared_scale - 6 + MXINT8_sum_bitcnt -1 < 255){
             //mantissa; shift so that leading 1 "falls off the cliff" (implicit leading 1 not encoded)
-            std::bitset<23> m23 = MXINT8_sum_result; //TODO discuss with Leo why this is necessary
-            FP32_sum_result.mantissa = m23 << (24 - MXINT8_sum_bitcnt); // Imagine this as just removing leading zeros & implicit 1.
+            // here we sometimes shift left so we still need all 32 bits until done shifting 
+            std::bitset<32> m23 = MXINT8_sum_result; //TODO discuss with Leo why this is necessary
+            m23 = m23 << (32 - MXINT8_sum_bitcnt + 1); // Imagine this as just removing leading zeros & implicit 1.
+            FP32_sum_result.mantissa = bitset_slice<32, 23>(m23, 9, 23);
             // FP32_sum_result.mantissa = MXINT8_sum_result * pow(2 , 24 - MXINT8_sum_bitcnt); //VERIFY implicit leading 1.. checks out 2/11/25
             // FP32_sum_result.mantissa = MXINT8_sum_result << (24 - MXINT8_sum_bitcnt); //OLIVER VERIFY EQUIVALENT?
             //exponent
@@ -116,22 +103,30 @@ FP32_ieee754 to_FP32(int32_t MXINT8_sum_result, int32_t shared_scale){
             FP32_sum_result.exponent = FP32_MAX_EXPONENT;
         }
     }
-    //*************************underflow case*************************
-    else if (shared_scale - 6 + MXINT8_sum_bitcnt -1 < 0) {// underflow
-        // retain sign, clamp to 0
-        // RAISE underflow flag
-        FP32_sum_result.underflow_flag = true;
-        FP32_sum_result.exponent = 0;
-        FP32_sum_result.mantissa = 0;
+    //*************************underflow and subnormal case*************************
+    else  {
+        // in both underflow and subnormal, retain sign
+        // in underflow result should be 0
+        // here we sometimes shift left so we still need all 32 bits until done shifting 
+        std::bitset<32> m23 = MXINT8_sum_result; //check
+        int32_t undershoot =  shared_scale - 6 + MXINT8_sum_bitcnt - 1;
+        int32_t correction = 32 - MXINT8_sum_bitcnt + undershoot;
+        // Imagine this as just removing or adding leading zeros to fit into the subnormal case range
+        if (correction < 0) m23 = m23 >> abs(correction);
+        if (correction > 0) m23 = m23 << correction;
+        FP32_sum_result.mantissa = bitset_slice<32, 23>(m23, 9, 23); //parse out first 23 bits
+        if (FP32_sum_result.mantissa == 0) FP32_sum_result.underflow_flag = true; // RAISE underflow flag
+        FP32_sum_result.exponent = 0; //ALWAYS ZERO
+
     } 
-    //*************************subnormal case*************************
-    else {
-        // subnormal
-        std::bitset<23> m23 = MXINT8_sum_result;
-        FP32_sum_result.mantissa = m23 << (24 - MXINT8_sum_bitcnt - 1); // Imagine this as just removing leading zeros.
-        // FP32_sum_result.mantissa = MXINT8_sum_result * pow(2 , 24 - MXINT8_sum_bitcnt - 1);
-        FP32_sum_result.exponent = 0;
-    }
+    // //*************************subnormal case*************************
+    // else {
+    //     // subnormal
+    //     std::bitset<23> m23 = MXINT8_sum_result;
+    //     FP32_sum_result.mantissa = m23 << (24 - MXINT8_sum_bitcnt - 1); // Imagine this as just removing leading zeros.
+    //     // FP32_sum_result.mantissa = MXINT8_sum_result * pow(2 , 24 - MXINT8_sum_bitcnt - 1);
+    //     FP32_sum_result.exponent = shared_scale - 6 + MXINT8_sum_bitcnt -1; //ALWAYS ZERO
+    // }
 
     return FP32_sum_result;
 }
