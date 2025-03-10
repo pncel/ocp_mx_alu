@@ -13,9 +13,9 @@ using namespace std;
 MXINT8_vector Normal_Cases() {
     MXINT8_vector testcase;
     for (int i = 0; i < 32; i++) {
-        testcase.elements[i] = bitset<8>(rand() % 255 - 127); 
+        testcase.elements[i] = bitset<8>(rand() % 255 - 127); //[-127, 127]
     }
-    testcase.scale = rand() % 255;
+    testcase.scale = rand() % 255; //[0, 254] avoids NaN
     return testcase;
 }
 
@@ -23,9 +23,9 @@ MXINT8_vector all_large_positive_elements() {
     MXINT8_vector testcase;
     
     for (int i = 0; i < 32; i++) {
-        testcase.elements[i] = bitset<8>(rand() % 27 + 100); //100 ~ 127
+        testcase.elements[i] = bitset<8>(rand() % 27 + 100); //[100, 126]
     }
-    testcase.scale = rand() % 255;
+    testcase.scale = rand() % 255; //[0, 254] avoids NaN
     return testcase;
 }
 
@@ -33,9 +33,9 @@ MXINT8_vector all_large_negative_elements() {
     MXINT8_vector testcase;
     
     for (int i = 0; i < 32; i++) {
-        testcase.elements[i] = bitset<8>(rand() % 27 -127 ); //-100 ~ -127
+        testcase.elements[i] = bitset<8>(rand() % 27 - 127 ); //[-127, -101]
     }
-    testcase.scale = rand() % 255;
+    testcase.scale = rand() % 255; //[0, 254] avoids NaN
     return testcase;
 }
 
@@ -43,9 +43,9 @@ MXINT8_vector large_scale_elements() {
     MXINT8_vector testcase;
     
     for (int i = 0; i < 32; i++) {
-        testcase.elements[i] = bitset<8>(rand() % 255 - 127 ); //-100 ~ -127
+        testcase.elements[i] = bitset<8>(rand() % 255 - 127 ); //[-127 ~ 127]
     }
-    testcase.scale = rand() % 16 + 239;
+    testcase.scale = rand() % 16 + 239; //[0, 254] avoids NaN
     return testcase;
 }
 
@@ -53,7 +53,7 @@ MXINT8_vector small_scale__elements() {
     MXINT8_vector testcase;
     
     for (int i = 0; i < 32; i++) {
-        testcase.elements[i] = bitset<8>(rand() % 155 -127 ); //-100 ~ -127
+        testcase.elements[i] = bitset<8>(rand() % 155 - 127 ); //[-127 ~ 27]
     }
     testcase.scale = rand() % 16 ;
     return testcase;
@@ -63,7 +63,7 @@ MXINT8_vector subnormal_edge() { //1*2**-126
     MXINT8_vector testcase;
     
     for (int i = 0; i < 32; i++) {
-        testcase.elements[i] = bitset<8>(rand() % 9 - 9 ); 
+        testcase.elements[i] = bitset<8>(rand() % 9 - 9 ); //[-127 ~ 27]
     }
     testcase.scale = rand() % 8 ;
     return testcase;
@@ -115,19 +115,22 @@ void publish_testcase_2vec(MXINT8_vector testcase_A, MXINT8_vector testcase_B) {
     cout << "scale_B = " << testcase_B.scale.to_ulong() << endl;
     cout << "expected result = " << "11111111111111111111111111111" << endl;
     cout << "unused flag = " << "11111111111111111111111111111" << endl;
-    cout << "overflow_flag = " << "11111111111111111111111111111" << endl;
+    cout << "underflow flag = " << "11111111111111111111111111111" << endl;
+    cout << "overflow flag = " << "11111111111111111111111111111" << endl;
 }
 
 int main(){
-    srand(time(NULL)); 
+    int seed = 777;
+    cout << "Random Seed: "<< seed << endl;
+    srand(seed); //time(NULL) for always random
     MXINT8_vector vector_A, vector_B;
     FP32_ieee754 FP32_sum_result;
     int case_cnt = 0;
 
     // Normal A dot Normal B
-    cout << "Normal A dot B: "<< endl;
+    cout << "\nNormal A dot B: "<< endl;
     for(int i = 0; i<10; i++){
-        cout << "Case = " << case_cnt << endl;
+        cout << "\nCase = " << case_cnt << endl;
         vector_A = Normal_Cases();
         vector_B = Normal_Cases();
         publish_testcase_2vec(vector_A, vector_B);
@@ -135,9 +138,9 @@ int main(){
     }
 
     // large positive elements
-    cout << "A dot B all_large_positive_elements"<<endl;
+    cout << "\nA dot B all_large_positive_elements"<<endl;
     for(int i = 0; i<3; i++){
-        cout << "Case = " << case_cnt << endl;
+        cout << "\nCase = " << case_cnt << endl;
         vector_A = all_large_positive_elements();
         vector_B = all_large_positive_elements();
         publish_testcase_2vec(vector_A, vector_B);
@@ -146,9 +149,9 @@ int main(){
 
     }
     
-    cout << "all_large_negative_elements"<<endl;
+    cout << "\nall_large_negative_elements"<<endl;
     for(int i = 0; i<3; i++){
-        cout << "Case = " << case_cnt << endl;
+        cout << "\nCase = " << case_cnt << endl;
         vector_A = all_large_negative_elements();
         vector_B = all_large_negative_elements();
         publish_testcase_2vec(vector_A, vector_B);
@@ -157,9 +160,9 @@ int main(){
     }
 
 
-    cout << "large_scale_elements" <<endl;
+    cout << "\nlarge_scale_elements" <<endl;
     for(int i = 0; i<3; i++){
-        cout << "Case = " << case_cnt << endl;
+        cout << "\nCase = " << case_cnt << endl;
         vector_A = large_scale_elements();
         vector_B = large_scale_elements();
         publish_testcase_2vec(vector_A, vector_B);
@@ -168,9 +171,9 @@ int main(){
     }
 
 
-    cout << "small_scale__elements" <<endl;
+    cout << "\nsmall_scale__elements" <<endl;
     for(int i = 0; i<3; i++){
-        cout << "Case = " << case_cnt << endl;
+        cout << "\nCase = " << case_cnt << endl;
         vector_A = small_scale__elements();
         vector_B = small_scale__elements();
         publish_testcase_2vec(vector_A, vector_B);
@@ -178,9 +181,9 @@ int main(){
     }
 
 
-    cout << "subnormal_edge" <<endl;
+    cout << "\nsubnormal_edge" <<endl;
     for(int i = 0; i<5; i++){
-        cout << "Case = " << case_cnt << endl;
+        cout << "\nCase = " << case_cnt << endl;
         vector_A = subnormal_edge();
         vector_B = subnormal_edge();
         publish_testcase_2vec(vector_A, vector_B);
@@ -188,9 +191,9 @@ int main(){
     }
 
 
-    cout << "positive_overflow" <<endl;
+    cout << "\npositive_overflow" <<endl;
     for(int i = 0; i<3; i++){
-        cout << "Case = " << case_cnt << endl;
+        cout << "\nCase = " << case_cnt << endl;
         vector_A = positive_overflow();
         vector_B = positive_overflow();
         publish_testcase_2vec(vector_A, vector_B);
@@ -198,9 +201,9 @@ int main(){
     }
 
 
-    cout << "negative_overflow" <<endl;
+    cout << "\nnegative_overflow" <<endl;
     for(int i = 0; i<3; i++){
-        cout << "Case = " << case_cnt << endl;
+        cout << "\nCase = " << case_cnt << endl;
         vector_A = negative_overflow();
         vector_B = negative_overflow();
         publish_testcase_2vec(vector_A, vector_B);
