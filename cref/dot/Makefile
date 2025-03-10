@@ -11,7 +11,7 @@ SCOREBOARD_SRC = dot_scoreboard.cpp
 TESTGEN_SRC  = dot_test_drv.cpp
 MODEL_SRC  = dot_mxint8_reference.cpp
 
-RESULT_FILE = test_result.txt
+RESULT_FILE = dot_test_result.txt
 TESTCASE_FILE = dot_testcases.txt
 
 # HEADERS := mxint8_dot.h, parameter.h

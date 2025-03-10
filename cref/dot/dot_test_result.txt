@@ -1,0 +1,184 @@
+case0 PASS: S_E_M: 0_00000000_00000000000000000000000; flags underflow_overflow_unused: 100
+case1 PASS: S_E_M: 1_01001100_11010101001101000000000; flags underflow_overflow_unused: 000
+case2 PASS: S_E_M: 1_11111110_11111111111111111111111; flags underflow_overflow_unused: 010
+case3 PASS: S_E_M: 0_11111110_11111111111111111111111; flags underflow_overflow_unused: 010
+case4 PASS: S_E_M: 0_11111110_11111111111111111111111; flags underflow_overflow_unused: 010
+case5 PASS: S_E_M: 1_01110011_10110101101100000000000; flags underflow_overflow_unused: 000
+case6 FAIL:
+   Mismatch in sign: Expected = 1, Actual = 0
+   Mismatch in exponent: Expected = 11111111, Actual = 00001111
+   Mismatch in mantissa: Expected = 00011111111111111111111, Actual = 00100001111110000000000
+   Mismatch in overflow_flag: Expected = 1, Actual = 0
+   Mismatch in underflow_flag: Expected = 1, Actual = 0
+   Mismatch in unused_flag: Expected = 1, Actual = 0
+case7 FAIL:
+   Mismatch in sign: Expected = 1, Actual = 0
+   Mismatch in exponent: Expected = 11111111, Actual = 11111011
+   Mismatch in mantissa: Expected = 00011111111111111111111, Actual = 01100011001000100000000
+   Mismatch in overflow_flag: Expected = 1, Actual = 0
+   Mismatch in underflow_flag: Expected = 1, Actual = 0
+   Mismatch in unused_flag: Expected = 1, Actual = 0
+case8 FAIL:
+   Mismatch in exponent: Expected = 11111111, Actual = 00011100
+   Mismatch in mantissa: Expected = 00011111111111111111111, Actual = 10101101000100000000000
+   Mismatch in overflow_flag: Expected = 1, Actual = 0
+   Mismatch in underflow_flag: Expected = 1, Actual = 0
+   Mismatch in unused_flag: Expected = 1, Actual = 0
+case9 FAIL:
+   Mismatch in exponent: Expected = 11111111, Actual = 01011001
+   Mismatch in mantissa: Expected = 00011111111111111111111, Actual = 01100000010000000000000
+   Mismatch in overflow_flag: Expected = 1, Actual = 0
+   Mismatch in underflow_flag: Expected = 1, Actual = 0
+   Mismatch in unused_flag: Expected = 1, Actual = 0
+case10 FAIL:
+   Mismatch in sign: Expected = 1, Actual = 0
+   Mismatch in exponent: Expected = 11111111, Actual = 11111110
+   Mismatch in mantissa: Expected = 00011111111111111111111, Actual = 11111111111111111111111
+   Mismatch in underflow_flag: Expected = 1, Actual = 0
+   Mismatch in unused_flag: Expected = 1, Actual = 0
+case11 FAIL:
+   Mismatch in sign: Expected = 1, Actual = 0
+   Mismatch in exponent: Expected = 11111111, Actual = 01101010
+   Mismatch in mantissa: Expected = 00011111111111111111111, Actual = 10001101011001110100000
+   Mismatch in overflow_flag: Expected = 1, Actual = 0
+   Mismatch in underflow_flag: Expected = 1, Actual = 0
+   Mismatch in unused_flag: Expected = 1, Actual = 0
+case12 FAIL:
+   Mismatch in sign: Expected = 1, Actual = 0
+   Mismatch in exponent: Expected = 11111111, Actual = 11011000
+   Mismatch in mantissa: Expected = 00011111111111111111111, Actual = 10011001000010000100000
+   Mismatch in overflow_flag: Expected = 1, Actual = 0
+   Mismatch in underflow_flag: Expected = 1, Actual = 0
+   Mismatch in unused_flag: Expected = 1, Actual = 0
+case13 FAIL:
+   Mismatch in sign: Expected = 1, Actual = 0
+   Mismatch in exponent: Expected = 11111111, Actual = 00110000
+   Mismatch in mantissa: Expected = 00011111111111111111111, Actual = 10100010011010010000000
+   Mismatch in overflow_flag: Expected = 1, Actual = 0
+   Mismatch in underflow_flag: Expected = 1, Actual = 0
+   Mismatch in unused_flag: Expected = 1, Actual = 0
+case14 FAIL:
+   Mismatch in sign: Expected = 1, Actual = 0
+   Mismatch in exponent: Expected = 11111111, Actual = 11000000
+   Mismatch in mantissa: Expected = 00011111111111111111111, Actual = 10011001100011010000000
+   Mismatch in overflow_flag: Expected = 1, Actual = 0
+   Mismatch in underflow_flag: Expected = 1, Actual = 0
+   Mismatch in unused_flag: Expected = 1, Actual = 0
+case15 FAIL:
+   Mismatch in sign: Expected = 1, Actual = 0
+   Mismatch in exponent: Expected = 11111111, Actual = 10000101
+   Mismatch in mantissa: Expected = 00011111111111111111111, Actual = 10011011010111000000000
+   Mismatch in overflow_flag: Expected = 1, Actual = 0
+   Mismatch in underflow_flag: Expected = 1, Actual = 0
+   Mismatch in unused_flag: Expected = 1, Actual = 0
+case16 FAIL:
+   Mismatch in exponent: Expected = 11111111, Actual = 11111110
+   Mismatch in mantissa: Expected = 00011111111111111111111, Actual = 11111111111111111111111
+   Mismatch in underflow_flag: Expected = 1, Actual = 0
+   Mismatch in unused_flag: Expected = 1, Actual = 0
+case17 FAIL:
+   Mismatch in exponent: Expected = 11111111, Actual = 11111110
+   Mismatch in mantissa: Expected = 00011111111111111111111, Actual = 11111111111111111111111
+   Mismatch in underflow_flag: Expected = 1, Actual = 0
+   Mismatch in unused_flag: Expected = 1, Actual = 0
+case18 FAIL:
+   Mismatch in exponent: Expected = 11111111, Actual = 11111110
+   Mismatch in mantissa: Expected = 00011111111111111111111, Actual = 11111111111111111111111
+   Mismatch in underflow_flag: Expected = 1, Actual = 0
+   Mismatch in unused_flag: Expected = 1, Actual = 0
+case19 FAIL:
+   Mismatch in sign: Expected = 1, Actual = 0
+   Mismatch in exponent: Expected = 11111111, Actual = 00000000
+   Mismatch in mantissa: Expected = 00011111111111111111111, Actual = 00000000000000000000000
+   Mismatch in overflow_flag: Expected = 1, Actual = 0
+   Mismatch in unused_flag: Expected = 1, Actual = 0
+case20 FAIL:
+   Mismatch in sign: Expected = 1, Actual = 0
+   Mismatch in exponent: Expected = 11111111, Actual = 00000000
+   Mismatch in mantissa: Expected = 00011111111111111111111, Actual = 00000000000000000000000
+   Mismatch in overflow_flag: Expected = 1, Actual = 0
+   Mismatch in unused_flag: Expected = 1, Actual = 0
+case21 FAIL:
+   Mismatch in sign: Expected = 1, Actual = 0
+   Mismatch in exponent: Expected = 11111111, Actual = 00000000
+   Mismatch in mantissa: Expected = 00011111111111111111111, Actual = 00000000000000000000000
+   Mismatch in overflow_flag: Expected = 1, Actual = 0
+   Mismatch in unused_flag: Expected = 1, Actual = 0
+case22 FAIL:
+   Mismatch in sign: Expected = 1, Actual = 0
+   Mismatch in exponent: Expected = 11111111, Actual = 00000000
+   Mismatch in mantissa: Expected = 00011111111111111111111, Actual = 00000000000000000000000
+   Mismatch in overflow_flag: Expected = 1, Actual = 0
+   Mismatch in unused_flag: Expected = 1, Actual = 0
+case23 FAIL:
+   Mismatch in sign: Expected = 1, Actual = 0
+   Mismatch in exponent: Expected = 11111111, Actual = 00000000
+   Mismatch in mantissa: Expected = 00011111111111111111111, Actual = 00000000000000000000000
+   Mismatch in overflow_flag: Expected = 1, Actual = 0
+   Mismatch in unused_flag: Expected = 1, Actual = 0
+case24 FAIL:
+   Mismatch in sign: Expected = 1, Actual = 0
+   Mismatch in exponent: Expected = 11111111, Actual = 00000000
+   Mismatch in mantissa: Expected = 00011111111111111111111, Actual = 00000000000000000000000
+   Mismatch in overflow_flag: Expected = 1, Actual = 0
+   Mismatch in unused_flag: Expected = 1, Actual = 0
+case25 FAIL:
+   Mismatch in sign: Expected = 1, Actual = 0
+   Mismatch in exponent: Expected = 11111111, Actual = 00000000
+   Mismatch in mantissa: Expected = 00011111111111111111111, Actual = 00000000000000000000000
+   Mismatch in overflow_flag: Expected = 1, Actual = 0
+   Mismatch in unused_flag: Expected = 1, Actual = 0
+case26 FAIL:
+   Mismatch in sign: Expected = 1, Actual = 0
+   Mismatch in exponent: Expected = 11111111, Actual = 00000000
+   Mismatch in mantissa: Expected = 00011111111111111111111, Actual = 00000000000000000000000
+   Mismatch in overflow_flag: Expected = 1, Actual = 0
+   Mismatch in unused_flag: Expected = 1, Actual = 0
+case26 FAIL:
+   Mismatch in sign: Expected = 1, Actual = 0
+   Mismatch in exponent: Expected = 11111111, Actual = 00000000
+   Mismatch in mantissa: Expected = 00011111111111111111111, Actual = 00000000000000000000000
+   Mismatch in overflow_flag: Expected = 1, Actual = 0
+   Mismatch in unused_flag: Expected = 1, Actual = 0
+case27 FAIL:
+   Mismatch in sign: Expected = 1, Actual = 0
+   Mismatch in exponent: Expected = 11111111, Actual = 11111110
+   Mismatch in mantissa: Expected = 00011111111111111111111, Actual = 11111111111111111111111
+   Mismatch in underflow_flag: Expected = 1, Actual = 0
+   Mismatch in unused_flag: Expected = 1, Actual = 0
+case28 FAIL:
+   Mismatch in sign: Expected = 1, Actual = 0
+   Mismatch in exponent: Expected = 11111111, Actual = 11111110
+   Mismatch in mantissa: Expected = 00011111111111111111111, Actual = 11111111111111111111111
+   Mismatch in underflow_flag: Expected = 1, Actual = 0
+   Mismatch in unused_flag: Expected = 1, Actual = 0
+case29 FAIL:
+   Mismatch in sign: Expected = 1, Actual = 0
+   Mismatch in exponent: Expected = 11111111, Actual = 11111110
+   Mismatch in mantissa: Expected = 00011111111111111111111, Actual = 11111111111111111111111
+   Mismatch in underflow_flag: Expected = 1, Actual = 0
+   Mismatch in unused_flag: Expected = 1, Actual = 0
+case29 FAIL:
+   Mismatch in sign: Expected = 1, Actual = 0
+   Mismatch in exponent: Expected = 11111111, Actual = 11111110
+   Mismatch in mantissa: Expected = 00011111111111111111111, Actual = 11111111111111111111111
+   Mismatch in underflow_flag: Expected = 1, Actual = 0
+   Mismatch in unused_flag: Expected = 1, Actual = 0
+case30 FAIL:
+   Mismatch in sign: Expected = 1, Actual = 0
+   Mismatch in exponent: Expected = 11111111, Actual = 11111110
+   Mismatch in mantissa: Expected = 00011111111111111111111, Actual = 11111111111111111111111
+   Mismatch in underflow_flag: Expected = 1, Actual = 0
+   Mismatch in unused_flag: Expected = 1, Actual = 0
+case31 FAIL:
+   Mismatch in sign: Expected = 1, Actual = 0
+   Mismatch in exponent: Expected = 11111111, Actual = 11111110
+   Mismatch in mantissa: Expected = 00011111111111111111111, Actual = 11111111111111111111111
+   Mismatch in underflow_flag: Expected = 1, Actual = 0
+   Mismatch in unused_flag: Expected = 1, Actual = 0
+case32 FAIL:
+   Mismatch in sign: Expected = 1, Actual = 0
+   Mismatch in exponent: Expected = 11111111, Actual = 11111110
+   Mismatch in mantissa: Expected = 00011111111111111111111, Actual = 11111111111111111111111
+   Mismatch in underflow_flag: Expected = 1, Actual = 0
+   Mismatch in unused_flag: Expected = 1, Actual = 0

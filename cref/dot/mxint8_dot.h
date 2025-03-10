@@ -37,8 +37,9 @@ struct FP32_ieee754 {
     std::bitset<23> mantissa;  // 23-bit field
     uint8_t bias : 8;
     bool overflow_flag;
+    bool underflow_flag;
     bool unused_flag;
-    FP32_ieee754() : sign(0), exponent(0), mantissa(0), bias(127), overflow_flag(false), unused_flag(false) {}
+    FP32_ieee754() : sign(0), exponent(0), mantissa(0), bias(127), overflow_flag(false), underflow_flag(false), unused_flag(false) {}
     
 };
 
