@@ -130,9 +130,15 @@ module mx_int8_dot_product_drv #(
                 valid_line = 1; // Mark line as valid
                 // @(posedge clk); // Wait for clock edge after processing scale
             end
+            
             if ($sscanf(one_line, "expected result = %b", f32_value) == 1) begin
                 o_float32_dot_product_drv = f32_value; // Assign to reg
                 // $display("expected result = %b", o_float32_dot_product_drv);
+                valid_line = 1; // Mark line as valid
+            end
+            if ($sscanf(one_line, "NaN flag = %d", NaN_flag) == 1) begin
+                NaN_flag_drv = NaN_flag; // Assign to reg
+                // $display("NaN flag = %d", NaN_flag);
                 valid_line = 1; // Mark line as valid
             end
             if ($sscanf(one_line, "unused flag = %d", unused_flag) == 1) begin
@@ -149,14 +155,9 @@ module mx_int8_dot_product_drv #(
                 overflow_flag_drv = overflow_flag; // Assign to reg
                 // $display("overflow flag = %d", overflow_flag);
                 valid_line = 1; // Mark line as valid
-                @(posedge clk);
-            end
-            if ($sscanf(one_line, "NaN flag = %d", NaN_flag) == 1) begin
-                NaN_flag_drv = NaN_flag; // Assign to reg
-                // $display("NaN flag = %d", NaN_flag);
-                valid_line = 1; // Mark line as valid
                 @(posedge clk); // Wait for clock edge after processing scale
             end
+            
             // If the line is not valid, skip or report an error
             // if (!valid_line) begin
             //     // $display("WARNING: Unrecognized line: '%0s'", one_line);
