@@ -150,7 +150,7 @@ module mxint8_dot_product (
                             // subnormal and underflow cases
                             o_float32[`FLOAT32_EXPONENT_BITS] = 8'b0;
                             if ((31 + scale_sum - 6) < 0) shifted_sum = (positive_sum[31:9]) >> (-1 * (31 + scale_sum - 6));
-                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6); //TODO
+                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6);
                             o_float32[`FLOAT32_MANTISSA_BITS] = shifted_sum[31:9];
                             if (shifted_sum[31:9] == 23'b0) o_underflow = 1;
                             
@@ -176,7 +176,7 @@ module mxint8_dot_product (
                             // subnormal and underflow cases
                             o_float32[`FLOAT32_EXPONENT_BITS] = 8'b0;
                             if ((31 + scale_sum - 6) < 0) shifted_sum = (positive_sum[31:9]) >> (-1 * (31 + scale_sum - 6));
-                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6); //TODO
+                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6);
                             o_float32[`FLOAT32_MANTISSA_BITS] = shifted_sum[31:9];
                             if (shifted_sum[31:9] == 23'b0) o_underflow = 1;
                             
@@ -199,7 +199,7 @@ module mxint8_dot_product (
                             // subnormal and underflow cases
                             o_float32[`FLOAT32_EXPONENT_BITS] = 8'b0;
                             if ((31 + scale_sum - 6) < 0) shifted_sum = (positive_sum[31:9]) >> (-1 * (31 + scale_sum - 6));
-                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6); //TODO
+                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6);
                             o_float32[`FLOAT32_MANTISSA_BITS] = shifted_sum[31:9];
                             if (shifted_sum[31:9] == 23'b0) o_underflow = 1;
                             
@@ -222,7 +222,7 @@ module mxint8_dot_product (
                             // subnormal and underflow cases
                             o_float32[`FLOAT32_EXPONENT_BITS] = 8'b0;
                             if ((31 + scale_sum - 6) < 0) shifted_sum = (positive_sum[31:9]) >> (-1 * (31 + scale_sum - 6));
-                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6); //TODO
+                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6);
                             o_float32[`FLOAT32_MANTISSA_BITS] = shifted_sum[31:9];
                             if (shifted_sum[31:9] == 23'b0) o_underflow = 1;
                             
@@ -245,7 +245,7 @@ module mxint8_dot_product (
                             // subnormal and underflow cases
                             o_float32[`FLOAT32_EXPONENT_BITS] = 8'b0;
                             if ((31 + scale_sum - 6) < 0) shifted_sum = (positive_sum[31:9]) >> (-1 * (31 + scale_sum - 6));
-                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6); //TODO
+                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6);
                             o_float32[`FLOAT32_MANTISSA_BITS] = shifted_sum[31:9];
                             if (shifted_sum[31:9] == 23'b0) o_underflow = 1;
                             
@@ -268,7 +268,7 @@ module mxint8_dot_product (
                             // subnormal and underflow cases
                             o_float32[`FLOAT32_EXPONENT_BITS] = 8'b0;
                             if ((31 + scale_sum - 6) < 0) shifted_sum = (positive_sum[31:9]) >> (-1 * (31 + scale_sum - 6));
-                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6); //TODO
+                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6);
                             o_float32[`FLOAT32_MANTISSA_BITS] = shifted_sum[31:9];
                             if (shifted_sum[31:9] == 23'b0) o_underflow = 1;
                         end 
@@ -290,7 +290,7 @@ module mxint8_dot_product (
                             // subnormal and underflow cases
                             o_float32[`FLOAT32_EXPONENT_BITS] = 8'b0;
                             if ((31 + scale_sum - 6) < 0) shifted_sum = (positive_sum[31:9]) >> (-1 * (31 + scale_sum - 6));
-                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6); //TODO
+                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6);
                             o_float32[`FLOAT32_MANTISSA_BITS] = shifted_sum[31:9];
                             if (shifted_sum[31:9] == 23'b0) o_underflow = 1;
                             
@@ -313,7 +313,7 @@ module mxint8_dot_product (
                             // subnormal and underflow cases
                             o_float32[`FLOAT32_EXPONENT_BITS] = 8'b0;
                             if ((31 + scale_sum - 6) < 0) shifted_sum = (positive_sum[31:9]) >> (-1 * (31 + scale_sum - 6));
-                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6); //TODO
+                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6);
                             o_float32[`FLOAT32_MANTISSA_BITS] = shifted_sum[31:9];
                             if (shifted_sum[31:9] == 23'b0) o_underflow = 1;
                             
@@ -336,7 +336,7 @@ module mxint8_dot_product (
                             // subnormal and underflow cases
                             o_float32[`FLOAT32_EXPONENT_BITS] = 8'b0;
                             if ((31 + scale_sum - 6) < 0) shifted_sum = (positive_sum[31:9]) >> (-1 * (31 + scale_sum - 6));
-                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6); //TODO
+                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6);
                             o_float32[`FLOAT32_MANTISSA_BITS] = shifted_sum[31:9];
                             if (shifted_sum[31:9] == 23'b0) o_underflow = 1;
                             
@@ -359,7 +359,7 @@ module mxint8_dot_product (
                             // subnormal and underflow cases
                             o_float32[`FLOAT32_EXPONENT_BITS] = 8'b0;
                             if ((31 + scale_sum - 6) < 0) shifted_sum = (positive_sum[31:9]) >> (-1 * (31 + scale_sum - 6));
-                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6); //TODO
+                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6);
                             o_float32[`FLOAT32_MANTISSA_BITS] = shifted_sum[31:9];
                             if (shifted_sum[31:9] == 23'b0) o_underflow = 1;
                             
@@ -382,7 +382,7 @@ module mxint8_dot_product (
                             // subnormal and underflow cases
                             o_float32[`FLOAT32_EXPONENT_BITS] = 8'b0;
                             if ((31 + scale_sum - 6) < 0) shifted_sum = (positive_sum[31:9]) >> (-1 * (31 + scale_sum - 6));
-                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6); //TODO
+                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6);
                             o_float32[`FLOAT32_MANTISSA_BITS] = shifted_sum[31:9];
                             if (shifted_sum[31:9] == 23'b0) o_underflow = 1;
                             
@@ -405,7 +405,7 @@ module mxint8_dot_product (
                             // subnormal and underflow cases
                             o_float32[`FLOAT32_EXPONENT_BITS] = 8'b0;
                             if ((31 + scale_sum - 6) < 0) shifted_sum = (positive_sum[31:9]) >> (-1 * (31 + scale_sum - 6));
-                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6); //TODO
+                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6);
                             o_float32[`FLOAT32_MANTISSA_BITS] = shifted_sum[31:9];
                             if (shifted_sum[31:9] == 23'b0) o_underflow = 1;
                             
@@ -428,7 +428,7 @@ module mxint8_dot_product (
                             // subnormal and underflow cases
                             o_float32[`FLOAT32_EXPONENT_BITS] = 8'b0;
                             if ((31 + scale_sum - 6) < 0) shifted_sum = (positive_sum[31:9]) >> (-1 * (31 + scale_sum - 6));
-                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6); //TODO
+                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6);
                             o_float32[`FLOAT32_MANTISSA_BITS] = shifted_sum[31:9];
                             if (shifted_sum[31:9] == 23'b0) o_underflow = 1;
                             
@@ -451,7 +451,7 @@ module mxint8_dot_product (
                             // subnormal and underflow cases
                             o_float32[`FLOAT32_EXPONENT_BITS] = 8'b0;
                             if ((31 + scale_sum - 6) < 0) shifted_sum = (positive_sum[31:9]) >> (-1 * (31 + scale_sum - 6));
-                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6); //TODO
+                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6);
                             o_float32[`FLOAT32_MANTISSA_BITS] = shifted_sum[31:9];
                             if (shifted_sum[31:9] == 23'b0) o_underflow = 1;
                             
@@ -474,7 +474,7 @@ module mxint8_dot_product (
                             // subnormal and underflow cases
                             o_float32[`FLOAT32_EXPONENT_BITS] = 8'b0;
                             if ((31 + scale_sum - 6) < 0) shifted_sum = (positive_sum[31:9]) >> (-1 * (31 + scale_sum - 6));
-                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6); //TODO
+                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6);
                             o_float32[`FLOAT32_MANTISSA_BITS] = shifted_sum[31:9];
                             if (shifted_sum[31:9] == 23'b0) o_underflow = 1;
                             
@@ -497,7 +497,7 @@ module mxint8_dot_product (
                             // subnormal and underflow cases
                             o_float32[`FLOAT32_EXPONENT_BITS] = 8'b0;
                             if ((31 + scale_sum - 6) < 0) shifted_sum = (positive_sum[31:9]) >> (-1 * (31 + scale_sum - 6));
-                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6); //TODO
+                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6);
                             o_float32[`FLOAT32_MANTISSA_BITS] = shifted_sum[31:9];
                             if (shifted_sum[31:9] == 23'b0) o_underflow = 1;
                             
@@ -520,7 +520,7 @@ module mxint8_dot_product (
                             // subnormal and underflow cases
                             o_float32[`FLOAT32_EXPONENT_BITS] = 8'b0;
                             if ((31 + scale_sum - 6) < 0) shifted_sum = (positive_sum[31:9]) >> (-1 * (31 + scale_sum - 6));
-                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6); //TODO
+                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6);
                             o_float32[`FLOAT32_MANTISSA_BITS] = shifted_sum[31:9];
                             if (shifted_sum[31:9] == 23'b0) o_underflow = 1;
                             
@@ -543,7 +543,7 @@ module mxint8_dot_product (
                             // subnormal and underflow cases
                             o_float32[`FLOAT32_EXPONENT_BITS] = 8'b0;
                             if ((31 + scale_sum - 6) < 0) shifted_sum = (positive_sum[31:9]) >> (-1 * (31 + scale_sum - 6));
-                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6); //TODO
+                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6);
                             o_float32[`FLOAT32_MANTISSA_BITS] = shifted_sum[31:9];
                             if (shifted_sum[31:9] == 23'b0) o_underflow = 1;
                             
@@ -566,7 +566,7 @@ module mxint8_dot_product (
                             // subnormal and underflow cases
                             o_float32[`FLOAT32_EXPONENT_BITS] = 8'b0;
                             if ((31 + scale_sum - 6) < 0) shifted_sum = (positive_sum[31:9]) >> (-1 * (31 + scale_sum - 6));
-                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6); //TODO
+                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6);
                             o_float32[`FLOAT32_MANTISSA_BITS] = shifted_sum[31:9];
                             if (shifted_sum[31:9] == 23'b0) o_underflow = 1;
                             
@@ -589,7 +589,7 @@ module mxint8_dot_product (
                             // subnormal and underflow cases
                             o_float32[`FLOAT32_EXPONENT_BITS] = 8'b0;
                             if ((31 + scale_sum - 6) < 0) shifted_sum = (positive_sum[31:9]) >> (-1 * (31 + scale_sum - 6));
-                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6); //TODO
+                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6);
                             o_float32[`FLOAT32_MANTISSA_BITS] = shifted_sum[31:9];
                             if (shifted_sum[31:9] == 23'b0) o_underflow = 1;
                             
@@ -612,7 +612,7 @@ module mxint8_dot_product (
                             // subnormal and underflow cases
                             o_float32[`FLOAT32_EXPONENT_BITS] = 8'b0;
                             if ((31 + scale_sum - 6) < 0) shifted_sum = (positive_sum[31:9]) >> (-1 * (31 + scale_sum - 6));
-                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6); //TODO
+                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6);
                             o_float32[`FLOAT32_MANTISSA_BITS] = shifted_sum[31:9];
                             if (shifted_sum[31:9] == 23'b0) o_underflow = 1;
                             
@@ -635,7 +635,7 @@ module mxint8_dot_product (
                             // subnormal and underflow cases
                             o_float32[`FLOAT32_EXPONENT_BITS] = 8'b0;
                             if ((31 + scale_sum - 6) < 0) shifted_sum = (positive_sum[31:9]) >> (-1 * (31 + scale_sum - 6));
-                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6); //TODO
+                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6);
                             o_float32[`FLOAT32_MANTISSA_BITS] = shifted_sum[31:9];
                             if (shifted_sum[31:9] == 23'b0) o_underflow = 1;
                             
@@ -658,7 +658,7 @@ module mxint8_dot_product (
                             // subnormal and underflow cases
                             o_float32[`FLOAT32_EXPONENT_BITS] = 8'b0;
                             if ((31 + scale_sum - 6) < 0) shifted_sum = (positive_sum[31:9]) >> (-1 * (31 + scale_sum - 6));
-                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6); //TODO
+                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6);
                             o_float32[`FLOAT32_MANTISSA_BITS] = shifted_sum[31:9];
                             if (shifted_sum[31:9] == 23'b0) o_underflow = 1;
                             
@@ -681,7 +681,7 @@ module mxint8_dot_product (
                             // subnormal and underflow cases
                             o_float32[`FLOAT32_EXPONENT_BITS] = 8'b0;
                             if ((31 + scale_sum - 6) < 0) shifted_sum = (positive_sum[31:9]) >> (-1 * (31 + scale_sum - 6));
-                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6); //TODO
+                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6);
                             o_float32[`FLOAT32_MANTISSA_BITS] = shifted_sum[31:9];
                             if (shifted_sum[31:9] == 23'b0) o_underflow = 1;
                             
@@ -704,7 +704,7 @@ module mxint8_dot_product (
                             // subnormal and underflow cases
                             o_float32[`FLOAT32_EXPONENT_BITS] = 8'b0;
                             if ((31 + scale_sum - 6) < 0) shifted_sum = (positive_sum[31:9]) >> (-1 * (31 + scale_sum - 6));
-                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6); //TODO
+                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6);
                             o_float32[`FLOAT32_MANTISSA_BITS] = shifted_sum[31:9];
                             if (shifted_sum[31:9] == 23'b0) o_underflow = 1;
                             
@@ -727,7 +727,7 @@ module mxint8_dot_product (
                             // subnormal and underflow cases
                             o_float32[`FLOAT32_EXPONENT_BITS] = 8'b0;
                             if ((31 + scale_sum - 6) < 0) shifted_sum = (positive_sum[31:9]) >> (-1 * (31 + scale_sum - 6));
-                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6); //TODO
+                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6);
                             o_float32[`FLOAT32_MANTISSA_BITS] = shifted_sum[31:9];
                             if (shifted_sum[31:9] == 23'b0) o_underflow = 1;
                             
@@ -750,7 +750,7 @@ module mxint8_dot_product (
                             // subnormal and underflow cases
                             o_float32[`FLOAT32_EXPONENT_BITS] = 8'b0;
                             if ((31 + scale_sum - 6) < 0) shifted_sum = (positive_sum[31:9]) >> (-1 * (31 + scale_sum - 6));
-                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6); //TODO
+                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6);
                             o_float32[`FLOAT32_MANTISSA_BITS] = shifted_sum[31:9];
                             if (shifted_sum[31:9] == 23'b0) o_underflow = 1;
                             
@@ -773,7 +773,7 @@ module mxint8_dot_product (
                             // subnormal and underflow cases
                             o_float32[`FLOAT32_EXPONENT_BITS] = 8'b0;
                             if ((31 + scale_sum - 6) < 0) shifted_sum = (positive_sum[31:9]) >> (-1 * (31 + scale_sum - 6));
-                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6); //TODO
+                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6);
                             o_float32[`FLOAT32_MANTISSA_BITS] = shifted_sum[31:9];
                             if (shifted_sum[31:9] == 23'b0) o_underflow = 1;
                             
@@ -796,7 +796,7 @@ module mxint8_dot_product (
                             // subnormal and underflow cases
                             o_float32[`FLOAT32_EXPONENT_BITS] = 8'b0;
                             if ((31 + scale_sum - 6) < 0) shifted_sum = (positive_sum[31:9]) >> (-1 * (31 + scale_sum - 6));
-                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6); //TODO
+                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6);
                             o_float32[`FLOAT32_MANTISSA_BITS] = shifted_sum[31:9];
                             if (shifted_sum[31:9] == 23'b0) o_underflow = 1;
                             
@@ -819,7 +819,7 @@ module mxint8_dot_product (
                             // subnormal and underflow cases
                             o_float32[`FLOAT32_EXPONENT_BITS] = 8'b0;
                             if ((31 + scale_sum - 6) < 0) shifted_sum = (positive_sum[31:9]) >> (-1 * (31 + scale_sum - 6));
-                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6); //TODO
+                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6);
                             o_float32[`FLOAT32_MANTISSA_BITS] = shifted_sum[31:9];
                             if (shifted_sum[31:9] == 23'b0) o_underflow = 1;
                             
@@ -842,7 +842,7 @@ module mxint8_dot_product (
                             // subnormal and underflow cases
                             o_float32[`FLOAT32_EXPONENT_BITS] = 8'b0;
                             if ((31 + scale_sum - 6) < 0) shifted_sum = (positive_sum[31:9]) >> (-1 * (31 + scale_sum - 6));
-                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6); //TODO
+                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6);
                             o_float32[`FLOAT32_MANTISSA_BITS] = shifted_sum[31:9];
                             if (shifted_sum[31:9] == 23'b0) o_underflow = 1;
                             
@@ -865,7 +865,7 @@ module mxint8_dot_product (
                             // subnormal and underflow cases
                             o_float32[`FLOAT32_EXPONENT_BITS] = 8'b0;
                             if ((31 + scale_sum - 6) < 0) shifted_sum = (positive_sum[31:9]) >> (-1 * (31 + scale_sum - 6));
-                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6); //TODO
+                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6);
                             o_float32[`FLOAT32_MANTISSA_BITS] = shifted_sum[31:9];
                             if (shifted_sum[31:9] == 23'b0) o_underflow = 1;
                             
