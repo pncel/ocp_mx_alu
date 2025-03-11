@@ -13,10 +13,11 @@ module mx_int8_dot_product_drv #(
     output reg[`FLOAT32_WIDTH-1:0]                            o_float32_dot_product_drv,
     output reg                                                unused_flag_drv,
     output reg                                                overflow_flag_drv,
+    output reg                                                underflow_flag_drv,
     output reg                                                NaN_flag_drv
 );
     localparam int half = CYCLE/2; 
-    parameter string FILENAME = "testcase.txt"; // Default to test.txt
+    parameter string FILENAME = "dot_testcases_key.txt"; // Default to "dot_testcases_key.txt"
   
    
 
@@ -66,13 +67,14 @@ module mx_int8_dot_product_drv #(
         reg [`FLOAT32_WIDTH-1:0] f32_value;
         int case_number;
         int index;
-        int value_a,value_b;
+        byte value_a,value_b;
         int scale_value_a;
         int scale_value_b;
         int status;
         int valid_line;
         int unused_flag;
         int overflow_flag;
+        int underflow_flag;
         int NaN_flag;
         #half;
         #half;
@@ -97,64 +99,61 @@ module mx_int8_dot_product_drv #(
 
             // Check if the line is "Case = %d"
             if ($sscanf(one_line, "Case = %d", case_number) == 1) begin
-                $display("Reading case = %0d", case_number);
+                $display("\nReading case = %0d", case_number);
                 valid_line = 1; // Mark line as valid
             end
 
-            // Check if the line is "element_a[%d] = %d"
-            if ($sscanf(one_line, "element_a[%d] = %d", index, value_a) == 2) begin
+            // Check if the line is "element_a[%d] = %d" element[0] = 7, -89
+            if ($sscanf(one_line, "element[%d] = %d, %d", index, value_a, value_b) == 3) begin
                 if (index >= `BLOCK_SIZE) begin
                     $display("ERROR: Invalid index %0d in line: '%0s'", index, one_line);
                     $finish;
                 end
                 mxint8_elements_a_drv[index] = value_a; // Assign to reg
-                $display("element_a[%d] = %d",  index, mxint8_elements_a_drv[index]);
+                mxint8_elements_b_drv[index] = value_b;
+                // $display("element[%d] = %d, %d",  index, byte'(mxint8_elements_a_drv[index]), byte'(mxint8_elements_b_drv[index]));
                 valid_line = 1; // Mark line as valid
             end
 
             // Check if the line is "scale_a = %d"
-            if ($sscanf(one_line, "scale_a = %d", scale_value_a) == 1) begin
+            if ($sscanf(one_line, "scale_A = %d", scale_value_a) == 1) begin
                 scale_a_drv = scale_value_a; // Assign to reg
-                $display("scale = %d", scale_a_drv);
+                // $display("scale_A = %d", scale_a_drv);
                 valid_line = 1; // Mark line as valid
                 // @(posedge clk); // Wait for clock edge after processing scale
             end
-            // Check if the line is "element_b[%d] = %d"
-            if ($sscanf(one_line, "element_b[%d] = %d", index, value_b) == 2) begin
-                if (index >= `BLOCK_SIZE) begin
-                    $display("ERROR: Invalid index %0d in line: '%0s'", index, one_line);
-                    $finish;
-                end
-                mxint8_elements_b_drv[index] = value_b; // Assign to reg
-                $display("element_b[%d] = %d",  index, mxint8_elements_b_drv[index]);
-                valid_line = 1; // Mark line as valid
-            end
-
+            
             // Check if the line is "scale_b = %d"
-            if ($sscanf(one_line, "scale_b = %d", scale_value_b) == 1) begin
+            if ($sscanf(one_line, "scale_B = %d", scale_value_b) == 1) begin
                 scale_b_drv = scale_value_b; // Assign to reg
-                $display("scale_b = %d", scale_b_drv);
+                // $display("scale_B = %d", scale_b_drv);
                 valid_line = 1; // Mark line as valid
                 // @(posedge clk); // Wait for clock edge after processing scale
             end
             if ($sscanf(one_line, "expected result = %b", f32_value) == 1) begin
                 o_float32_dot_product_drv = f32_value; // Assign to reg
-                $display("expected result = %b", o_float32_dot_product_drv);
+                // $display("expected result = %b", o_float32_dot_product_drv);
                 valid_line = 1; // Mark line as valid
             end
-            if ($sscanf(one_line, "unused flag = %b", unused_flag) == 1) begin
+            if ($sscanf(one_line, "unused flag = %d", unused_flag) == 1) begin
                 unused_flag_drv = unused_flag; // Assign to reg
-                $display("unused flag = %b", unused_flag);
+                // $display("unused flag = %d", unused_flag);
                 valid_line = 1; // Mark line as valid
             end
-            if ($sscanf(one_line, "overflow flag = %b", overflow_flag) == 1) begin
+            if ($sscanf(one_line, "underflow flag = %d", underflow_flag) == 1) begin
+                underflow_flag_drv = underflow_flag; // Assign to reg
+                // $display("underflow flag = %d", underflow_flag);
+                valid_line = 1; // Mark line as valid
+            end
+            if ($sscanf(one_line, "overflow flag = %d", overflow_flag) == 1) begin
                 overflow_flag_drv = overflow_flag; // Assign to reg
-                $display("overflow flag = %b", overflow_flag);
+                // $display("overflow flag = %d", overflow_flag);
                 valid_line = 1; // Mark line as valid
+                @(posedge clk);
             end
-            if ($sscanf(one_line, "NaN flag = %b", NaN_flag) == 1) begin
+            if ($sscanf(one_line, "NaN flag = %d", NaN_flag) == 1) begin
                 NaN_flag_drv = NaN_flag; // Assign to reg
-                $display("NaN flag = %b", NaN_flag);
+                // $display("NaN flag = %d", NaN_flag);
                 valid_line = 1; // Mark line as valid
                 @(posedge clk); // Wait for clock edge after processing scale
             end

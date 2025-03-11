@@ -10,10 +10,12 @@ module mx_int8_dot_product_mon(
     input  reg [`BLOCK_SIZE-1:0][`MXINT8_ELEMENT_WIDTH-1:0]   i_mxint8_elements_b ,
     input  reg [`FLOAT32_WIDTH-1:0]                           i_float32_ref,
     input  reg                                                i_overflow_ref,
+    input  reg                                                i_underflow_ref,
     input  reg                                                i_unused_ref,
     input  reg                                                i_NaN_ref,
     input  reg [`FLOAT32_WIDTH-1:0]                           i_float32_dut,
     input  reg                                                i_overflow_dut,
+    input  reg                                                i_underflow_dut,
     input  reg                                                i_unused_dut,
     input  reg                                                i_NaN_dut
 
@@ -47,16 +49,16 @@ module mx_int8_dot_product_mon(
         print_dut_out();
         print_ref_out();
         
-        if(i_float32_dut != i_float32_ref || i_overflow_dut != i_overflow_ref || i_unused_dut != i_unused_ref || i_NaN_dut != i_NaN_ref )
+        if(i_float32_dut != i_float32_ref || i_underflow_dut != i_underflow_ref || i_overflow_dut != i_overflow_ref || i_unused_dut != i_unused_ref || i_NaN_dut != i_NaN_ref )
             $display("ERROR case.");
         transaction_id <= transaction_id + 1; 
     end
 
     function void print_dut_out();
-        $display("FP32 DUT SUM OUTPUT: %b   %f, overflow flag: %b, unused flag: %b, NaN flag: %b,", i_float32_dut,i_float32_dut,i_overflow_dut,i_unused_dut,i_NaN_dut);
+        $display("FP32 DUT SUM OUTPUT: %b   %f, overflow flag: %d, underflow flag: %d, unused flag: %d, NaN flag: %d,", i_float32_dut,i_float32_dut,i_overflow_dut,i_underflow_dut,i_unused_dut,i_NaN_dut);
     endfunction
     function void print_ref_out();
-        $display("FP32 ref SUM OUTPUT: %b   %f, overflow flag: %b, unused flag: %b, NaN flag: %b,", i_float32_ref,i_float32_ref,i_overflow_ref,i_unused_ref,i_NaN_ref);
+        $display("FP32 ref SUM OUTPUT: %b   %f, overflow flag: %d, underflow flag: %d, unused flag: %d, NaN flag: %d,", i_float32_ref,i_float32_ref,i_overflow_ref,i_underflow_ref,i_unused_ref,i_NaN_ref);
     endfunction
 //     function reg[`FLOAT32_WIDTH-1:0] print_input_vector();
 //         shortreal scale_r;
