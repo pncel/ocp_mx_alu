@@ -1,23 +1,39 @@
-#generated with perplexity
+# Makefile for dot product reference module testing
+# make run
+
 CXX := g++
 CXXFLAGS := -Wall -Wextra -std=c++17
-TARGET := add
-SRCS := main.cpp
-HEADERS := mxint8_add.h
-OBJS := $(SRCS:.cpp=.o)
+# targets
+SCOREBOARD = scoreboard
+TESTGEN = testgen
+#sources
+SCOREBOARD_SRC = add_scoreboard.cpp
+TESTGEN_SRC  = add_test_drv.cpp
+MODEL_SRC  = add_mxint8_reference.cpp
 
-all: $(TARGET)
+RESULT_FILE = add_test_result.txt
+TESTCASE_FILE = add_testcases.txt
 
-$(TARGET): $(OBJS)
+# HEADERS := mxint8_dot.h, parameter.h
+# OBJS := $(SRCS:.cpp=.o)
+# all: $(TARGET)
+
+$(SCOREBOARD) : $(SCOREBOARD_SRC) $(MODEL_SRC)
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
-%.o: %.cpp $(HEADERS)
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+$(TESTGEN) : $(TESTGEN_SRC)
+	$(CXX) $(CXXFLAGS) -o $@ $^
 
 .PHONY: clean run
 
 clean:
-	rm -f $(OBJS) $(TARGET)
+	rm -f $(SCOREBOARD) $(TESTGEN) $(RESULT_FILE) $(TESTCASE_FILE)
 
-run: $(TARGET)
-	./$(TARGET)
+# g++ -o test dot_test_drv.cpp
+# ./test > dot_testcases.txt
+# g++ -o scoreboard dot_scoreboard.cpp dot_mxint8_reference.cpp
+# ./scoreboard > test_result.txt
+run: $(TESTGEN) $(SCOREBOARD)
+	./$(TESTGEN) > $(TESTCASE_FILE)
+	./$(SCOREBOARD) > $(RESULT_FILE)
+

@@ -19,6 +19,8 @@ using s8 = int8_t;
 
 using namespace std;
 
+
+
 struct MXINT8_vector {
     std::bitset<8> scale;  // 8-bit field
     uint8_t bias : 8;
@@ -38,6 +40,7 @@ struct FP32_ieee754 {
     
 };
 
+MXINT8_vector add_mxint8_reference(MXINT8_vector a, MXINT8_vector b, bool do_largest_result_rounding);
 // template<
 //     typename Repr,
 //     Repr scale_mask,
