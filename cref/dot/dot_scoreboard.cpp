@@ -80,6 +80,15 @@ void processFile_and_answer(const string& fileName) {
             actual_result = dot_mxint8_reference(a, b);
 
         }
+        // NaN
+        if (line.find("NaN") != string::npos){
+            int NaN;
+            if (sscanf(line.c_str(), "NaN flag = %d", &NaN) == 1)
+                expected_result.NaN_flag = static_cast<bool>(NaN);
+            else {
+                cout << "Warning: Failed to parse  " << line << endl;
+            }
+        }
         // unused
         if (line.find("unused") != string::npos){
             int unused;
@@ -109,15 +118,16 @@ void processFile_and_answer(const string& fileName) {
             cout << "case" << case_cnt << " ";
             if(expected_result.underflow_flag == actual_result.underflow_flag && 
                 expected_result.overflow_flag == actual_result.overflow_flag && 
+                expected_result.NaN_flag == actual_result.NaN_flag && 
                 expected_result.unused_flag == actual_result.unused_flag && 
                 expected_result.sign == actual_result.sign && 
                 expected_result.exponent == actual_result.exponent && 
                 expected_result.mantissa == actual_result.mantissa) {
                     cout << "PASS: S_E_M: " << actual_result.sign << "_" << actual_result.exponent << "_" << actual_result.mantissa << "; ";
-                    cout << "flags underflow_overflow_unused: " << actual_result.underflow_flag << actual_result.overflow_flag << actual_result.unused_flag << endl;
+                    cout << "flags underflow_overflow_unused_NaN: " << actual_result.underflow_flag << actual_result.overflow_flag << actual_result.unused_flag << actual_result.NaN_flag << endl;
             } else {
                 cout << "FAIL: S_E_M: " << actual_result.sign << "_" << actual_result.exponent << "_" << actual_result.mantissa << "; ";
-                cout << "flags underflow_overflow_unused: " << actual_result.underflow_flag << actual_result.overflow_flag << actual_result.unused_flag << endl;
+                cout << "flags underflow_overflow_unused_NaN: " << actual_result.underflow_flag << actual_result.overflow_flag << actual_result.unused_flag << actual_result.NaN_flag << endl;
                 if (expected_result.sign != actual_result.sign) {
                     cout << "   Mismatch in sign: "
                         << "Expected = " << expected_result.sign << ", Actual = " << actual_result.sign << endl;

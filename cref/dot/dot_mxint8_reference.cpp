@@ -18,6 +18,14 @@ FP32_ieee754 dot_mxint8_reference(MXINT8_vector a, MXINT8_vector b) {
 
     // Multiply the block scales (X) through adding the scale factors bits after applying bias; 
     // Add because scale bits encode X through 2^(scale_int - 127); need 9 bits
+    FP32_ieee754 result = FP32_ieee754();
+    // NaN case
+    if (a.scale == 0b11111111 || b.scale == 0b11111111) {
+        result.NaN_flag = 1;
+        result.exponent = 0b11111111;
+        result.mantissa = 1; //ambiguous
+        return result;
+    }
     int32_t new_scale = ((static_cast<int32_t>(a.scale.to_ulong())-127) + (static_cast<int32_t>(b.scale.to_ulong())-127)) + 127;
     // std::cout << "new scale " << new_scale << std::endl;
 
@@ -37,7 +45,7 @@ FP32_ieee754 dot_mxint8_reference(MXINT8_vector a, MXINT8_vector b) {
     // cout << "\n" <<"Intermediate Dot Product Result (extended mxint8 element) " << std::bitset<32> {abs(sum_of_products)} << endl;
     // cout << "\n" <<"Absolute Value " << std::bitset<32> {abs(sum_of_products)} << endl;
     // fit into FP32 (IEEE754) representation, clamp if too large
-    FP32_ieee754 result = to_FP32(sum_of_products, new_scale);
+    result = to_FP32(sum_of_products, new_scale);
     result.unused_flag = unused_flag;
     return result;
     //return
@@ -111,6 +119,8 @@ FP32_ieee754 to_FP32(int32_t MXINT8_sum_result, int32_t shared_scale){
         std::bitset<32> m23 = MXINT8_sum_result; //check
         int32_t undershoot =  shared_scale - 6 + MXINT8_sum_bitcnt - 1;
         int32_t correction = 32 - MXINT8_sum_bitcnt + undershoot;
+        // correction = 32 - MXINT8_sum_bitcnt + shared_scale - 6 + MXINT8_sum_bitcnt - 1
+        // correction = 32 + shared_scale - 6 - 1
         // Imagine this as just removing or adding leading zeros to fit into the subnormal case range
         if (correction < 0) m23 = m23 >> abs(correction);
         if (correction > 0) m23 = m23 << correction;

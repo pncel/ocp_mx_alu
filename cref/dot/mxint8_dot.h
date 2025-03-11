@@ -39,7 +39,8 @@ struct FP32_ieee754 {
     bool overflow_flag;
     bool underflow_flag;
     bool unused_flag;
-    FP32_ieee754() : sign(0), exponent(0), mantissa(0), bias(127), overflow_flag(false), underflow_flag(false), unused_flag(false) {}
+    bool NaN_flag;
+    FP32_ieee754() : sign(0), exponent(0), mantissa(0), bias(127), overflow_flag(false), underflow_flag(false), unused_flag(false), NaN_flag(false) {}
     
 };
 

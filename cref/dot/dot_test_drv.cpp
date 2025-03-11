@@ -134,6 +134,7 @@ void publish_testcase_2vec(MXINT8_vector testcase_A, MXINT8_vector testcase_B) {
     cout << "scale_A = " << testcase_A.scale.to_ulong() << endl;
     cout << "scale_B = " << testcase_B.scale.to_ulong() << endl;
     cout << "expected result = " << endl;
+    cout << "NaN flag = " << endl;
     cout << "unused flag = " << endl;
     cout << "underflow flag = " << endl;
     cout << "overflow flag = " << endl;
