@@ -7,7 +7,7 @@ preliminary designs
 
 | function                      | C++ model |Verilog | Testbench    |
 | --------                      | -------   |------- | -------- |
-| add (vec-vec)                  | ✅       | ✏️     | ❌     |
+| add (vec-vec)                  | ✅       | ✅     | ✏️     |
 | multiply (scalar-vec)             | ❌       | ❌     | ❌     |
 | multiply (vec-vec)             | ❌       | ❌     | ❌     |
 | dot product (vector)    | ✅       | ✅     | ✅     |
