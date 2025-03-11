@@ -9,18 +9,20 @@ module mxint8_dot_product (
     input  wire [`BLOCK_SIZE-1:0][`MXINT8_ELEMENT_WIDTH-1:0]    i_mxint8_elements_b,
     output reg  [`FLOAT32_WIDTH-1:0]                            o_float32,
     output reg                                                  o_overflow,
+    output reg                                                  o_underflow,
     output reg                                                  o_is_unused,
     output reg                                                  o_is_NaN
 );
 
 
-
+    wire signed [`SCALE_WIDTH+4:0]   scale_sum;
     reg signed [31:0]               dot_product_sum;
-    reg        [31:0]               positive_sum_reg;
-    reg        [`SCALE_WIDTH-1:0]   scale_sum_clamped; 
+    //reg        [31:0]               positive_sum_reg;
+    reg        [31:0]               shifted_sum;
+    // reg        [`SCALE_WIDTH-1:0]   scale_sum_clamped; 
     reg        [ 9:0]               scale_tmp;
     wire       [31:0]               positive_sum;
-    wire       [`SCALE_WIDTH+4:0]   scale_sum; 
+    // wire       [`SCALE_WIDTH+4:0]   scale_sum; 
     wire       [`BLOCK_SIZE-1:0]    is_unused_vec_a; 
     wire       [`BLOCK_SIZE-1:0]    is_unused_vec_b; 
 
@@ -32,8 +34,8 @@ module mxint8_dot_product (
         end
     endgenerate
     assign o_is_unused = (|is_unused_vec_a) | (|is_unused_vec_b);
-
-    always @(*) begin
+    assign o_is_NaN = (i_scale_a == 8'b1111_1111 || i_scale_b == 8'b1111_1111);
+    always @(*) begin //TODO: GenVar performance optimize
         dot_product_sum =
             ({ {(32-`MXINT8_ELEMENT_WIDTH){i_mxint8_elements_a[31][`MXINT8_ELEMENT_WIDTH-1]}}, i_mxint8_elements_a[31][`MXINT8_ELEMENT_WIDTH-1:0] } * 
              { {(32-`MXINT8_ELEMENT_WIDTH){i_mxint8_elements_b[31][`MXINT8_ELEMENT_WIDTH-1]}}, i_mxint8_elements_b[31][`MXINT8_ELEMENT_WIDTH-1:0] })+
@@ -101,246 +103,784 @@ module mxint8_dot_product (
              { {(32-`MXINT8_ELEMENT_WIDTH){i_mxint8_elements_b[ 0][`MXINT8_ELEMENT_WIDTH-1]}}, i_mxint8_elements_b[ 0][`MXINT8_ELEMENT_WIDTH-1:0] });
  
     end
-  
+    
     // wire [31:0] scaled_dot_product;
-    assign scale_sum = i_scale_a + i_scale_b;
+    assign scale_sum = (i_scale_a + i_scale_b - 127); //signed wire
 
     assign positive_sum = (dot_product_sum[31]) ? ~dot_product_sum + 1 : dot_product_sum;
     
 
     always @(*) begin
-        //============================================================================
-        // if scale_sum is larger than 1111_1111 bits, clamp it and shift positive_sum 
-        //============================================================================
-        if(scale_sum > 8'b1111_1111) begin
-            scale_sum_clamped     = 8'b1111_1111;
-        end
-        else begin
-            scale_sum_clamped     = scale_sum;
-        end
-        positive_sum_reg    = positive_sum << (scale_sum - scale_sum_clamped);
-        //============================================================================
+        
+        o_overflow = 0;
+        o_underflow = 0;
+        shifted_sum = positive_sum;
         
         // pass over the sign from the resulting sum
         o_float32[`FLOAT32_SIGN_BIT] = dot_product_sum[31];
 
-
-        if (scale_sum_clamped == 8'b1111_1111) begin
+        if (o_is_NaN) begin // TODO: discuss change with Leo
             // if vector is NaN, then float32 is also NaN
-            o_float32[`FLOAT32_MANTISSA_BITS] = 23'd1;
+            o_float32[`FLOAT32_MANTISSA_BITS] = 23'd1; // does this matter?
             o_float32[`FLOAT32_EXPONENT_BITS] = 8'b1111_1111;
-            o_is_NaN = 1'b1;
         end
-        else if(positive_sum_reg == 32'd0) begin
-            //case for zero
-            o_float32[30:0] = {23'b0, 8'b0};
-            o_is_NaN = 1'b0;
+
+        else if(positive_sum == 32'd0) begin
+            //case for ZERO
+            o_float32[`FLOAT32_MANTISSA_BITS] = 23'b0;
+            o_float32[`FLOAT32_EXPONENT_BITS] = 8'b0;
         end
         else begin
-            //subnormal case for FP32
-            //min for normal case of FP32 is 2^-126 so positive_sum would be subnormal 
-            //if positive_sum_reg << scale_sum_clamped-6-127 < 2^-126
-            if(((positive_sum_reg << scale_sum_clamped) < 8'd128) && (scale_sum_clamped < 8)) begin
-                o_float32[`FLOAT32_EXPONENT_BITS] = 8'b00000000; 
-                unique casez (scale_sum_clamped)
-                    8'b00000110 : begin //i_scale = 6
-                        //the exponent will be 0. 
-                        //we shift MANTISSA_BITS right for 1 bit. which is 23-1=22
-                        o_float32[`FLOAT32_MANTISSA_BITS] = positive_sum_reg << 22;
+
+                casez (positive_sum)
+                    32'b0000_0000_0000_0000_0000_0000_0000_0001 : begin //bitcnt1
+                        if (scale_sum - 6 > 0) begin
+                            if (scale_sum - 6 < 255) begin
+                                o_float32[`FLOAT32_MANTISSA_BITS] = 23'b0;
+                                o_float32[`FLOAT32_EXPONENT_BITS] = scale_sum - 8'd6;
+                            end
+                            else begin
+                                // overflow
+                                o_float32[`FLOAT32_MANTISSA_BITS] = {`FLOAT32_MANTISSA_WIDTH{1'b1}};
+                                o_float32[`FLOAT32_EXPONENT_BITS] = 8'b11111110;
+                                o_overflow = 1;
+                            end
+                        end
+                        else begin
+                            // subnormal and underflow cases
+                            o_float32[`FLOAT32_EXPONENT_BITS] = 8'b0;
+                            if ((31 + scale_sum - 6) < 0) shifted_sum = (positive_sum[31:9]) >> (-1 * (31 + scale_sum - 6));
+                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6); //TODO
+                            o_float32[`FLOAT32_MANTISSA_BITS] = shifted_sum[31:9];
+                            if (shifted_sum[31:9] == 23'b0) o_underflow = 1;
+                            
+                        end 
+                        // o_float32[`FLOAT32_MANTISSA_BITS] = 23'b0;
+                        // scale_tmp = scale_sum_clamped - 8'd6;
                     end
-                    8'b00000101 : begin //i_scale = 5
-                        o_float32[`FLOAT32_MANTISSA_BITS] = positive_sum_reg << 21;
+                    32'b0000_0000_0000_0000_0000_0000_0000_001? : begin //bitcnt2
+                        if (scale_sum - 6 + 1 > 0) begin
+                            if (scale_sum - 6 + 1 < 255) begin
+                                // o_float32[`FLOAT32_MANTISSA_BITS] = positive_sum_reg << 31;
+                                o_float32[`FLOAT32_MANTISSA_BITS] = {positive_sum[0], 22'b0};
+                                o_float32[`FLOAT32_EXPONENT_BITS] = scale_sum - 8'd5;
+                            end
+                            else begin
+                                // overflow
+                                o_float32[`FLOAT32_MANTISSA_BITS] = {`FLOAT32_MANTISSA_WIDTH{1'b1}};
+                                o_float32[`FLOAT32_EXPONENT_BITS] = 8'b11111110;
+                                o_overflow = 1;
+                            end
+                        end
+                        else begin
+                            // subnormal and underflow cases
+                            o_float32[`FLOAT32_EXPONENT_BITS] = 8'b0;
+                            if ((31 + scale_sum - 6) < 0) shifted_sum = (positive_sum[31:9]) >> (-1 * (31 + scale_sum - 6));
+                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6); //TODO
+                            o_float32[`FLOAT32_MANTISSA_BITS] = shifted_sum[31:9];
+                            if (shifted_sum[31:9] == 23'b0) o_underflow = 1;
+                            
+                        end 
                     end
-                    8'b00000100 : begin //i_scale = 4
-                        o_float32[`FLOAT32_MANTISSA_BITS] = positive_sum_reg << 20;
-                    end
-                    8'b00000011 : begin //i_scale = 3
-                        o_float32[`FLOAT32_MANTISSA_BITS] = positive_sum_reg << 19;
-                    end
-                    8'b00000010 : begin //i_scale = 2
-                        o_float32[`FLOAT32_MANTISSA_BITS] = positive_sum_reg << 18;
-                    end
-                    8'b00000001 : begin //i_scale = 1
-                        o_float32[`FLOAT32_MANTISSA_BITS] = positive_sum_reg << 17;
-                    end
-                    8'b00000000 : begin //i_scale = 0
-                        o_float32[`FLOAT32_MANTISSA_BITS] = positive_sum_reg << 16;
-                    end
-                endcase
-            end
-            //normal case for FP32
-            else begin
-                casez (positive_sum_reg)
-                    32'b0000_0000_0000_0000_0000_0000_0000_0001 : begin
-                        o_float32[`FLOAT32_MANTISSA_BITS] = 23'b0;
-                        scale_tmp = scale_sum_clamped - 8'd6;
-                        o_is_NaN = 1'b0;
-                    end
-                    32'b0000_0000_0000_0000_0000_0000_0000_001? : begin
-                        o_float32[`FLOAT32_MANTISSA_BITS] = {positive_sum_reg[0], 22'b0};
-                        scale_tmp = scale_sum_clamped - 8'd5;
-                        o_is_NaN = 1'b0;
-                    end
-                    32'b0000_0000_0000_0000_0000_0000_0000_01?? : begin
-                        o_float32[`FLOAT32_MANTISSA_BITS] = {positive_sum_reg[1:0], 21'b0};
-                        scale_tmp = scale_sum_clamped - 8'd4;
-                        o_is_NaN = 1'b0;
+                    32'b0000_0000_0000_0000_0000_0000_0000_01?? : begin //bitcnt3
+                        if (scale_sum - 6 + 2 > 0) begin
+                            if (scale_sum - 6 + 2 < 255) begin
+                                o_float32[`FLOAT32_MANTISSA_BITS] = {positive_sum[1:0], 21'b0};
+                                o_float32[`FLOAT32_EXPONENT_BITS] = scale_sum - 8'd4;
+                            end
+                            else begin
+                                // overflow
+                                o_float32[`FLOAT32_MANTISSA_BITS] = {`FLOAT32_MANTISSA_WIDTH{1'b1}};
+                                o_float32[`FLOAT32_EXPONENT_BITS] = 8'b11111110;
+                                o_overflow = 1;
+                            end
+                        end
+                        else begin
+                            // subnormal and underflow cases
+                            o_float32[`FLOAT32_EXPONENT_BITS] = 8'b0;
+                            if ((31 + scale_sum - 6) < 0) shifted_sum = (positive_sum[31:9]) >> (-1 * (31 + scale_sum - 6));
+                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6); //TODO
+                            o_float32[`FLOAT32_MANTISSA_BITS] = shifted_sum[31:9];
+                            if (shifted_sum[31:9] == 23'b0) o_underflow = 1;
+                            
+                        end 
                     end
                     32'b0000_0000_0000_0000_0000_0000_0000_1??? : begin
-                        o_float32[`FLOAT32_MANTISSA_BITS] = {positive_sum_reg[2:0], 20'b0};
-                        scale_tmp = scale_sum_clamped - 8'd3;
-                        o_is_NaN = 1'b0;
+                        if (scale_sum - 6 + 3 > 0) begin
+                            if (scale_sum - 6 + 3 < 255) begin
+                                o_float32[`FLOAT32_MANTISSA_BITS] = {positive_sum[2:0], 20'b0};
+                                o_float32[`FLOAT32_EXPONENT_BITS] = scale_sum - 8'd3;
+                            end
+                            else begin
+                                // overflow
+                                o_float32[`FLOAT32_MANTISSA_BITS] = {`FLOAT32_MANTISSA_WIDTH{1'b1}};
+                                o_float32[`FLOAT32_EXPONENT_BITS] = 8'b11111110;
+                                o_overflow = 1;
+                            end
+                        end
+                        else begin
+                            // subnormal and underflow cases
+                            o_float32[`FLOAT32_EXPONENT_BITS] = 8'b0;
+                            if ((31 + scale_sum - 6) < 0) shifted_sum = (positive_sum[31:9]) >> (-1 * (31 + scale_sum - 6));
+                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6); //TODO
+                            o_float32[`FLOAT32_MANTISSA_BITS] = shifted_sum[31:9];
+                            if (shifted_sum[31:9] == 23'b0) o_underflow = 1;
+                            
+                        end 
                     end
                     32'b0000_0000_0000_0000_0000_0000_0001_???? : begin
-                        o_float32[`FLOAT32_MANTISSA_BITS] = {positive_sum_reg[3:0], 19'b0};
-                        scale_tmp = scale_sum_clamped - 8'd2;
-                        o_is_NaN = 1'b0;
+                        if (scale_sum - 6 + 4 > 0) begin
+                            if (scale_sum - 6 + 4 < 255) begin
+                                o_float32[`FLOAT32_MANTISSA_BITS] = {positive_sum[3:0], 19'b0};
+                                o_float32[`FLOAT32_EXPONENT_BITS] = scale_sum - 8'd2;
+                            end
+                            else begin
+                                // overflow
+                                o_float32[`FLOAT32_MANTISSA_BITS] = {`FLOAT32_MANTISSA_WIDTH{1'b1}};
+                                o_float32[`FLOAT32_EXPONENT_BITS] = 8'b11111110;
+                                o_overflow = 1;
+                            end
+                        end
+                        else begin
+                            // subnormal and underflow cases
+                            o_float32[`FLOAT32_EXPONENT_BITS] = 8'b0;
+                            if ((31 + scale_sum - 6) < 0) shifted_sum = (positive_sum[31:9]) >> (-1 * (31 + scale_sum - 6));
+                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6); //TODO
+                            o_float32[`FLOAT32_MANTISSA_BITS] = shifted_sum[31:9];
+                            if (shifted_sum[31:9] == 23'b0) o_underflow = 1;
+                            
+                        end 
                     end 
                     32'b0000_0000_0000_0000_0000_0000_001?_???? : begin
-                        o_float32[`FLOAT32_MANTISSA_BITS] = {positive_sum_reg[4:0], 18'b0};
-                        scale_tmp = scale_sum_clamped - 8'd1;
-                        o_is_NaN = 1'b0;
+                        if (scale_sum - 6 + 5 > 0) begin
+                            if (scale_sum - 6 + 5 < 255) begin
+                                o_float32[`FLOAT32_MANTISSA_BITS] = {positive_sum[4:0], 18'b0};
+                                o_float32[`FLOAT32_EXPONENT_BITS] = scale_sum - 8'd1;
+                            end
+                            else begin
+                                // overflow
+                                o_float32[`FLOAT32_MANTISSA_BITS] = {`FLOAT32_MANTISSA_WIDTH{1'b1}};
+                                o_float32[`FLOAT32_EXPONENT_BITS] = 8'b11111110;
+                                o_overflow = 1;
+                            end
+                        end
+                        else begin
+                            // subnormal and underflow cases
+                            o_float32[`FLOAT32_EXPONENT_BITS] = 8'b0;
+                            if ((31 + scale_sum - 6) < 0) shifted_sum = (positive_sum[31:9]) >> (-1 * (31 + scale_sum - 6));
+                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6); //TODO
+                            o_float32[`FLOAT32_MANTISSA_BITS] = shifted_sum[31:9];
+                            if (shifted_sum[31:9] == 23'b0) o_underflow = 1;
+                        end 
                     end
                     32'b0000_0000_0000_0000_0000_0000_01??_???? : begin
-                        o_float32[`FLOAT32_MANTISSA_BITS] = {positive_sum_reg[5:0], 17'b0};
-                        scale_tmp = scale_sum_clamped;
-                        o_is_NaN = 1'b0;
+                        if (scale_sum - 6 + 6 > 0) begin
+                            if (scale_sum - 6 + 6 < 255) begin
+                                o_float32[`FLOAT32_MANTISSA_BITS] = {positive_sum[5:0], 17'b0};
+                                o_float32[`FLOAT32_EXPONENT_BITS] = scale_sum;
+                            end
+                            else begin
+                                // overflow
+                                o_float32[`FLOAT32_MANTISSA_BITS] = {`FLOAT32_MANTISSA_WIDTH{1'b1}};
+                                o_float32[`FLOAT32_EXPONENT_BITS] = 8'b11111110;
+                                o_overflow = 1;
+                            end
+                        end
+                        else begin
+                            // subnormal and underflow cases
+                            o_float32[`FLOAT32_EXPONENT_BITS] = 8'b0;
+                            if ((31 + scale_sum - 6) < 0) shifted_sum = (positive_sum[31:9]) >> (-1 * (31 + scale_sum - 6));
+                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6); //TODO
+                            o_float32[`FLOAT32_MANTISSA_BITS] = shifted_sum[31:9];
+                            if (shifted_sum[31:9] == 23'b0) o_underflow = 1;
+                            
+                        end 
                     end
                     32'b0000_0000_0000_0000_0000_0000_1???_???? : begin
-                        o_float32[`FLOAT32_MANTISSA_BITS] = {positive_sum_reg[6:0], 16'b0};
-                        scale_tmp = scale_sum_clamped + 8'd1;
-                        o_is_NaN = 1'b0;
+                        if (scale_sum - 6 + 7 > 0) begin
+                            if (scale_sum - 6 + 7 < 255) begin
+                                o_float32[`FLOAT32_MANTISSA_BITS] = {positive_sum[6:0], 16'b0};
+                                o_float32[`FLOAT32_EXPONENT_BITS] = scale_sum + 8'd1;
+                            end
+                            else begin
+                                // overflow
+                                o_float32[`FLOAT32_MANTISSA_BITS] = {`FLOAT32_MANTISSA_WIDTH{1'b1}};
+                                o_float32[`FLOAT32_EXPONENT_BITS] = 8'b11111110;
+                                o_overflow = 1;
+                            end
+                        end
+                        else begin
+                            // subnormal and underflow cases
+                            o_float32[`FLOAT32_EXPONENT_BITS] = 8'b0;
+                            if ((31 + scale_sum - 6) < 0) shifted_sum = (positive_sum[31:9]) >> (-1 * (31 + scale_sum - 6));
+                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6); //TODO
+                            o_float32[`FLOAT32_MANTISSA_BITS] = shifted_sum[31:9];
+                            if (shifted_sum[31:9] == 23'b0) o_underflow = 1;
+                            
+                        end 
                     end
                     32'b0000_0000_0000_0000_0000_0001_????_???? : begin
-                        o_float32[`FLOAT32_MANTISSA_BITS] = {positive_sum_reg[7:0], 15'b0};
-                        scale_tmp = scale_sum_clamped + 8'd2;
-                        o_is_NaN = 1'b0;
+                        if (scale_sum - 6 + 8 > 0) begin
+                            if (scale_sum - 6 + 8 < 255) begin
+                                o_float32[`FLOAT32_MANTISSA_BITS] = {positive_sum[7:0], 15'b0};
+                                o_float32[`FLOAT32_EXPONENT_BITS] = scale_sum + 8'd2;
+                            end
+                            else begin
+                                // overflow
+                                o_float32[`FLOAT32_MANTISSA_BITS] = {`FLOAT32_MANTISSA_WIDTH{1'b1}};
+                                o_float32[`FLOAT32_EXPONENT_BITS] = 8'b11111110;
+                                o_overflow = 1;
+                            end
+                        end
+                        else begin
+                            // subnormal and underflow cases
+                            o_float32[`FLOAT32_EXPONENT_BITS] = 8'b0;
+                            if ((31 + scale_sum - 6) < 0) shifted_sum = (positive_sum[31:9]) >> (-1 * (31 + scale_sum - 6));
+                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6); //TODO
+                            o_float32[`FLOAT32_MANTISSA_BITS] = shifted_sum[31:9];
+                            if (shifted_sum[31:9] == 23'b0) o_underflow = 1;
+                            
+                        end 
                     end
                     32'b0000_0000_0000_0000_0000_001?_????_???? : begin
-                        o_float32[`FLOAT32_MANTISSA_BITS] = {positive_sum_reg[8:0], 14'b0};
-                        scale_tmp = scale_sum_clamped + 8'd3;
-                        o_is_NaN = 1'b0;
+                        if (scale_sum - 6 + 9 > 0) begin
+                            if (scale_sum - 6 + 9 < 255) begin
+                                o_float32[`FLOAT32_MANTISSA_BITS] = {positive_sum[8:0], 14'b0};
+                                o_float32[`FLOAT32_EXPONENT_BITS] = scale_sum + 8'd3;
+                            end
+                            else begin
+                                // overflow
+                                o_float32[`FLOAT32_MANTISSA_BITS] = {`FLOAT32_MANTISSA_WIDTH{1'b1}};
+                                o_float32[`FLOAT32_EXPONENT_BITS] = 8'b11111110;
+                                o_overflow = 1;
+                            end
+                        end
+                        else begin
+                            // subnormal and underflow cases
+                            o_float32[`FLOAT32_EXPONENT_BITS] = 8'b0;
+                            if ((31 + scale_sum - 6) < 0) shifted_sum = (positive_sum[31:9]) >> (-1 * (31 + scale_sum - 6));
+                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6); //TODO
+                            o_float32[`FLOAT32_MANTISSA_BITS] = shifted_sum[31:9];
+                            if (shifted_sum[31:9] == 23'b0) o_underflow = 1;
+                            
+                        end 
                     end
                     32'b0000_0000_0000_0000_0000_01??_????_???? : begin
-                        o_float32[`FLOAT32_MANTISSA_BITS] = {positive_sum_reg[9:0], 13'b0};
-                        scale_tmp = scale_sum_clamped + 8'd4;
-                        o_is_NaN = 1'b0;
+                        if (scale_sum - 6 + 10 > 0) begin
+                            if (scale_sum - 6 + 10 < 255) begin
+                                o_float32[`FLOAT32_MANTISSA_BITS] = {positive_sum[9:0], 13'b0};
+                                o_float32[`FLOAT32_EXPONENT_BITS] = scale_sum + 8'd4;
+                            end
+                            else begin
+                                // overflow
+                                o_float32[`FLOAT32_MANTISSA_BITS] = {`FLOAT32_MANTISSA_WIDTH{1'b1}};
+                                o_float32[`FLOAT32_EXPONENT_BITS] = 8'b11111110;
+                                o_overflow = 1;
+                            end
+                        end
+                        else begin
+                            // subnormal and underflow cases
+                            o_float32[`FLOAT32_EXPONENT_BITS] = 8'b0;
+                            if ((31 + scale_sum - 6) < 0) shifted_sum = (positive_sum[31:9]) >> (-1 * (31 + scale_sum - 6));
+                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6); //TODO
+                            o_float32[`FLOAT32_MANTISSA_BITS] = shifted_sum[31:9];
+                            if (shifted_sum[31:9] == 23'b0) o_underflow = 1;
+                            
+                        end 
                     end
                     32'b0000_0000_0000_0000_0000_1???_????_???? : begin
-                        o_float32[`FLOAT32_MANTISSA_BITS] = {positive_sum_reg[10:0], 12'b0};
-                        scale_tmp = scale_sum_clamped + 8'd5;
-                        o_is_NaN = 1'b0;
+                        if (scale_sum - 6 + 11 > 0) begin
+                            if (scale_sum - 6 + 11 < 255) begin
+                                o_float32[`FLOAT32_MANTISSA_BITS] = {positive_sum[10:0], 12'b0};
+                                o_float32[`FLOAT32_EXPONENT_BITS] = scale_sum + 8'd5;
+                            end
+                            else begin
+                                // overflow
+                                o_float32[`FLOAT32_MANTISSA_BITS] = {`FLOAT32_MANTISSA_WIDTH{1'b1}};
+                                o_float32[`FLOAT32_EXPONENT_BITS] = 8'b11111110;
+                                o_overflow = 1;
+                            end
+                        end
+                        else begin
+                            // subnormal and underflow cases
+                            o_float32[`FLOAT32_EXPONENT_BITS] = 8'b0;
+                            if ((31 + scale_sum - 6) < 0) shifted_sum = (positive_sum[31:9]) >> (-1 * (31 + scale_sum - 6));
+                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6); //TODO
+                            o_float32[`FLOAT32_MANTISSA_BITS] = shifted_sum[31:9];
+                            if (shifted_sum[31:9] == 23'b0) o_underflow = 1;
+                            
+                        end 
                     end
                     32'b0000_0000_0000_0000_0001_????_????_???? : begin
-                        o_float32[`FLOAT32_MANTISSA_BITS] = {positive_sum_reg[11:0], 11'b0};
-                        scale_tmp = scale_sum_clamped + 8'd6;
-                        o_is_NaN = 1'b0;
+                        if (scale_sum - 6 + 12 > 0) begin
+                            if (scale_sum - 6 + 12 < 255) begin
+                                o_float32[`FLOAT32_MANTISSA_BITS] = {positive_sum[11:0], 11'b0};
+                                o_float32[`FLOAT32_EXPONENT_BITS] = scale_sum + 8'd6;
+                            end
+                            else begin
+                                // overflow
+                                o_float32[`FLOAT32_MANTISSA_BITS] = {`FLOAT32_MANTISSA_WIDTH{1'b1}};
+                                o_float32[`FLOAT32_EXPONENT_BITS] = 8'b11111110;
+                                o_overflow = 1;
+                            end
+                        end
+                        else begin
+                            // subnormal and underflow cases
+                            o_float32[`FLOAT32_EXPONENT_BITS] = 8'b0;
+                            if ((31 + scale_sum - 6) < 0) shifted_sum = (positive_sum[31:9]) >> (-1 * (31 + scale_sum - 6));
+                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6); //TODO
+                            o_float32[`FLOAT32_MANTISSA_BITS] = shifted_sum[31:9];
+                            if (shifted_sum[31:9] == 23'b0) o_underflow = 1;
+                            
+                        end 
                     end
                     32'b0000_0000_0000_0000_001?_????_????_???? : begin
-                        o_float32[`FLOAT32_MANTISSA_BITS] = {positive_sum_reg[12:0], 10'b0};
-                        scale_tmp = scale_sum_clamped + 8'd7;
-                        o_is_NaN = 1'b0;
+                        if (scale_sum - 6 + 13 > 0) begin
+                            if (scale_sum - 6 + 13 < 255) begin
+                                o_float32[`FLOAT32_MANTISSA_BITS] = {positive_sum[12:0], 10'b0};
+                                o_float32[`FLOAT32_EXPONENT_BITS] = scale_sum + 8'd7;
+                            end
+                            else begin
+                                // overflow
+                                o_float32[`FLOAT32_MANTISSA_BITS] = {`FLOAT32_MANTISSA_WIDTH{1'b1}};
+                                o_float32[`FLOAT32_EXPONENT_BITS] = 8'b11111110;
+                                o_overflow = 1;
+                            end
+                        end
+                        else begin
+                            // subnormal and underflow cases
+                            o_float32[`FLOAT32_EXPONENT_BITS] = 8'b0;
+                            if ((31 + scale_sum - 6) < 0) shifted_sum = (positive_sum[31:9]) >> (-1 * (31 + scale_sum - 6));
+                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6); //TODO
+                            o_float32[`FLOAT32_MANTISSA_BITS] = shifted_sum[31:9];
+                            if (shifted_sum[31:9] == 23'b0) o_underflow = 1;
+                            
+                        end 
                     end 
                     32'b0000_0000_0000_0000_01??_????_????_???? : begin
-                        o_float32[`FLOAT32_MANTISSA_BITS] = {positive_sum_reg[13:0], 9'b0};
-                        scale_tmp = scale_sum_clamped + 8'd8;
-                        o_is_NaN = 1'b0;
+                        if (scale_sum - 6 + 14 > 0) begin
+                            if (scale_sum - 6 + 14 < 255) begin
+                                o_float32[`FLOAT32_MANTISSA_BITS] = {positive_sum[13:0], 9'b0};
+                                o_float32[`FLOAT32_EXPONENT_BITS] = scale_sum + 8'd8;
+                            end
+                            else begin
+                                // overflow
+                                o_float32[`FLOAT32_MANTISSA_BITS] = {`FLOAT32_MANTISSA_WIDTH{1'b1}};
+                                o_float32[`FLOAT32_EXPONENT_BITS] = 8'b11111110;
+                                o_overflow = 1;
+                            end
+                        end
+                        else begin
+                            // subnormal and underflow cases
+                            o_float32[`FLOAT32_EXPONENT_BITS] = 8'b0;
+                            if ((31 + scale_sum - 6) < 0) shifted_sum = (positive_sum[31:9]) >> (-1 * (31 + scale_sum - 6));
+                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6); //TODO
+                            o_float32[`FLOAT32_MANTISSA_BITS] = shifted_sum[31:9];
+                            if (shifted_sum[31:9] == 23'b0) o_underflow = 1;
+                            
+                        end 
                     end
                     32'b0000_0000_0000_0000_1???_????_????_???? : begin
-                        o_float32[`FLOAT32_MANTISSA_BITS] = {positive_sum_reg[14:0], 8'b0};
-                        scale_tmp = scale_sum_clamped + 8'd9;
-                        o_is_NaN = 1'b0;
+                        if (scale_sum - 6 + 15 > 0) begin
+                            if (scale_sum - 6 + 15 < 255) begin
+                                o_float32[`FLOAT32_MANTISSA_BITS] = {positive_sum[14:0], 8'b0};
+                                o_float32[`FLOAT32_EXPONENT_BITS] = scale_sum + 8'd9;
+                            end
+                            else begin
+                                // overflow
+                                o_float32[`FLOAT32_MANTISSA_BITS] = {`FLOAT32_MANTISSA_WIDTH{1'b1}};
+                                o_float32[`FLOAT32_EXPONENT_BITS] = 8'b11111110;
+                                o_overflow = 1;
+                            end
+                        end
+                        else begin
+                            // subnormal and underflow cases
+                            o_float32[`FLOAT32_EXPONENT_BITS] = 8'b0;
+                            if ((31 + scale_sum - 6) < 0) shifted_sum = (positive_sum[31:9]) >> (-1 * (31 + scale_sum - 6));
+                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6); //TODO
+                            o_float32[`FLOAT32_MANTISSA_BITS] = shifted_sum[31:9];
+                            if (shifted_sum[31:9] == 23'b0) o_underflow = 1;
+                            
+                        end 
                     end
                     32'b0000_0000_0000_0001_????_????_????_???? : begin
-                        o_float32[`FLOAT32_MANTISSA_BITS] = {positive_sum_reg[15:0], 7'b0};
-                        scale_tmp = scale_sum_clamped + 8'd10;
-                        o_is_NaN = 1'b0;
+                        if (scale_sum - 6 + 16 > 0) begin
+                            if (scale_sum - 6 + 16 < 255) begin
+                                o_float32[`FLOAT32_MANTISSA_BITS] = {positive_sum[15:0], 7'b0};
+                                o_float32[`FLOAT32_EXPONENT_BITS] = scale_sum + 8'd10;
+                            end
+                            else begin
+                                // overflow
+                                o_float32[`FLOAT32_MANTISSA_BITS] = {`FLOAT32_MANTISSA_WIDTH{1'b1}};
+                                o_float32[`FLOAT32_EXPONENT_BITS] = 8'b11111110;
+                                o_overflow = 1;
+                            end
+                        end
+                        else begin
+                            // subnormal and underflow cases
+                            o_float32[`FLOAT32_EXPONENT_BITS] = 8'b0;
+                            if ((31 + scale_sum - 6) < 0) shifted_sum = (positive_sum[31:9]) >> (-1 * (31 + scale_sum - 6));
+                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6); //TODO
+                            o_float32[`FLOAT32_MANTISSA_BITS] = shifted_sum[31:9];
+                            if (shifted_sum[31:9] == 23'b0) o_underflow = 1;
+                            
+                        end 
                     end
                     32'b0000_0000_0000_001?_????_????_????_???? : begin
-                        o_float32[`FLOAT32_MANTISSA_BITS] = {positive_sum_reg[16:0], 6'b0};
-                        scale_tmp = scale_sum_clamped + 8'd11;
-                        o_is_NaN = 1'b0;
+                        if (scale_sum - 6 + 17 > 0) begin
+                            if (scale_sum - 6 + 17 < 255) begin
+                                o_float32[`FLOAT32_MANTISSA_BITS] = {positive_sum[16:0], 6'b0};
+                                o_float32[`FLOAT32_EXPONENT_BITS] = scale_sum + 8'd11;
+                            end
+                            else begin
+                                // overflow
+                                o_float32[`FLOAT32_MANTISSA_BITS] = {`FLOAT32_MANTISSA_WIDTH{1'b1}};
+                                o_float32[`FLOAT32_EXPONENT_BITS] = 8'b11111110;
+                                o_overflow = 1;
+                            end
+                        end
+                        else begin
+                            // subnormal and underflow cases
+                            o_float32[`FLOAT32_EXPONENT_BITS] = 8'b0;
+                            if ((31 + scale_sum - 6) < 0) shifted_sum = (positive_sum[31:9]) >> (-1 * (31 + scale_sum - 6));
+                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6); //TODO
+                            o_float32[`FLOAT32_MANTISSA_BITS] = shifted_sum[31:9];
+                            if (shifted_sum[31:9] == 23'b0) o_underflow = 1;
+                            
+                        end 
                     end
                     32'b0000_0000_0000_01??_????_????_????_???? : begin
-                        o_float32[`FLOAT32_MANTISSA_BITS] = {positive_sum_reg[17:0], 5'b0};
-                        scale_tmp = scale_sum_clamped + 8'd12;
-                        o_is_NaN = 1'b0;
+                        if (scale_sum - 6 + 18 > 0) begin
+                            if (scale_sum - 6 + 18 < 255) begin
+                                o_float32[`FLOAT32_MANTISSA_BITS] = {positive_sum[17:0], 5'b0};
+                                o_float32[`FLOAT32_EXPONENT_BITS] = scale_sum + 8'd12;
+                            end
+                            else begin
+                                // overflow
+                                o_float32[`FLOAT32_MANTISSA_BITS] = {`FLOAT32_MANTISSA_WIDTH{1'b1}};
+                                o_float32[`FLOAT32_EXPONENT_BITS] = 8'b11111110;
+                                o_overflow = 1;
+                            end
+                        end
+                        else begin
+                            // subnormal and underflow cases
+                            o_float32[`FLOAT32_EXPONENT_BITS] = 8'b0;
+                            if ((31 + scale_sum - 6) < 0) shifted_sum = (positive_sum[31:9]) >> (-1 * (31 + scale_sum - 6));
+                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6); //TODO
+                            o_float32[`FLOAT32_MANTISSA_BITS] = shifted_sum[31:9];
+                            if (shifted_sum[31:9] == 23'b0) o_underflow = 1;
+                            
+                        end 
                     end
                     32'b0000_0000_0000_1???_????_????_????_???? : begin
-                        o_float32[`FLOAT32_MANTISSA_BITS] = {positive_sum_reg[18:0], 4'b0};
-                        scale_tmp = scale_sum_clamped + 8'd13;
-                        o_is_NaN = 1'b0;
+                        if (scale_sum - 6 + 19 > 0) begin
+                            if (scale_sum - 6 + 19 < 255) begin
+                                o_float32[`FLOAT32_MANTISSA_BITS] = {positive_sum[18:0], 4'b0};
+                                o_float32[`FLOAT32_EXPONENT_BITS] = scale_sum + 8'd13;
+                            end
+                            else begin
+                                // overflow
+                                o_float32[`FLOAT32_MANTISSA_BITS] = {`FLOAT32_MANTISSA_WIDTH{1'b1}};
+                                o_float32[`FLOAT32_EXPONENT_BITS] = 8'b11111110;
+                                o_overflow = 1;
+                            end
+                        end
+                        else begin
+                            // subnormal and underflow cases
+                            o_float32[`FLOAT32_EXPONENT_BITS] = 8'b0;
+                            if ((31 + scale_sum - 6) < 0) shifted_sum = (positive_sum[31:9]) >> (-1 * (31 + scale_sum - 6));
+                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6); //TODO
+                            o_float32[`FLOAT32_MANTISSA_BITS] = shifted_sum[31:9];
+                            if (shifted_sum[31:9] == 23'b0) o_underflow = 1;
+                            
+                        end 
                     end
                     32'b0000_0000_0001_????_????_????_????_???? : begin
-                        o_float32[`FLOAT32_MANTISSA_BITS] = {positive_sum_reg[19:0], 3'b0};
-                        scale_tmp = scale_sum_clamped + 8'd14;
-                        o_is_NaN = 1'b0;
+                        if (scale_sum - 6 + 20 > 0) begin
+                            if (scale_sum - 6 + 20 < 255) begin
+                                o_float32[`FLOAT32_MANTISSA_BITS] = {positive_sum[19:0], 3'b0};
+                                o_float32[`FLOAT32_EXPONENT_BITS] = scale_sum + 8'd14;
+                            end
+                            else begin
+                                // overflow
+                                o_float32[`FLOAT32_MANTISSA_BITS] = {`FLOAT32_MANTISSA_WIDTH{1'b1}};
+                                o_float32[`FLOAT32_EXPONENT_BITS] = 8'b11111110;
+                                o_overflow = 1;
+                            end
+                        end
+                        else begin
+                            // subnormal and underflow cases
+                            o_float32[`FLOAT32_EXPONENT_BITS] = 8'b0;
+                            if ((31 + scale_sum - 6) < 0) shifted_sum = (positive_sum[31:9]) >> (-1 * (31 + scale_sum - 6));
+                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6); //TODO
+                            o_float32[`FLOAT32_MANTISSA_BITS] = shifted_sum[31:9];
+                            if (shifted_sum[31:9] == 23'b0) o_underflow = 1;
+                            
+                        end 
                     end
                     32'b0000_0000_001?_????_????_????_????_???? : begin
-                        o_float32[`FLOAT32_MANTISSA_BITS] = {positive_sum_reg[20:0], 2'b0};
-                        scale_tmp = scale_sum_clamped + 8'd15;
-                        o_is_NaN = 1'b0;
+                        if (scale_sum - 6 + 21 > 0) begin
+                            if (scale_sum - 6 + 21 < 255) begin
+                                o_float32[`FLOAT32_MANTISSA_BITS] = {positive_sum[20:0], 2'b0};
+                                o_float32[`FLOAT32_EXPONENT_BITS] = scale_sum + 8'd15;
+                            end
+                            else begin
+                                // overflow
+                                o_float32[`FLOAT32_MANTISSA_BITS] = {`FLOAT32_MANTISSA_WIDTH{1'b1}};
+                                o_float32[`FLOAT32_EXPONENT_BITS] = 8'b11111110;
+                                o_overflow = 1;
+                            end
+                        end
+                        else begin
+                            // subnormal and underflow cases
+                            o_float32[`FLOAT32_EXPONENT_BITS] = 8'b0;
+                            if ((31 + scale_sum - 6) < 0) shifted_sum = (positive_sum[31:9]) >> (-1 * (31 + scale_sum - 6));
+                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6); //TODO
+                            o_float32[`FLOAT32_MANTISSA_BITS] = shifted_sum[31:9];
+                            if (shifted_sum[31:9] == 23'b0) o_underflow = 1;
+                            
+                        end 
                     end
                     32'b0000_0000_01??_????_????_????_????_???? : begin
-                        o_float32[`FLOAT32_MANTISSA_BITS] = {positive_sum_reg[21:0], 1'b0};
-                        scale_tmp = scale_sum_clamped + 8'd16;
-                        o_is_NaN = 1'b0;
+                        if (scale_sum - 6 + 22 > 0) begin
+                            if (scale_sum - 6 + 22 < 255) begin
+                                o_float32[`FLOAT32_MANTISSA_BITS] = {positive_sum[21:0], 1'b0};
+                                o_float32[`FLOAT32_EXPONENT_BITS] = scale_sum + 8'd16;
+                            end
+                            else begin
+                                // overflow
+                                o_float32[`FLOAT32_MANTISSA_BITS] = {`FLOAT32_MANTISSA_WIDTH{1'b1}};
+                                o_float32[`FLOAT32_EXPONENT_BITS] = 8'b11111110;
+                                o_overflow = 1;
+                            end
+                        end
+                        else begin
+                            // subnormal and underflow cases
+                            o_float32[`FLOAT32_EXPONENT_BITS] = 8'b0;
+                            if ((31 + scale_sum - 6) < 0) shifted_sum = (positive_sum[31:9]) >> (-1 * (31 + scale_sum - 6));
+                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6); //TODO
+                            o_float32[`FLOAT32_MANTISSA_BITS] = shifted_sum[31:9];
+                            if (shifted_sum[31:9] == 23'b0) o_underflow = 1;
+                            
+                        end 
                     end
                     32'b0000_0000_1???_????_????_????_????_???? : begin
-                        o_float32[`FLOAT32_MANTISSA_BITS] = positive_sum_reg[22:0];
-                        scale_tmp = scale_sum_clamped + 8'd17;
-                        o_is_NaN = 1'b0;
+                        if (scale_sum - 6 + 23 > 0) begin
+                            if (scale_sum - 6 + 23 < 255) begin
+                                o_float32[`FLOAT32_MANTISSA_BITS] = positive_sum[22:0];
+                                o_float32[`FLOAT32_EXPONENT_BITS] = scale_sum + 8'd17;
+                            end
+                            else begin
+                                // overflow
+                                o_float32[`FLOAT32_MANTISSA_BITS] = {`FLOAT32_MANTISSA_WIDTH{1'b1}};
+                                o_float32[`FLOAT32_EXPONENT_BITS] = 8'b11111110;
+                                o_overflow = 1;
+                            end
+                        end
+                        else begin
+                            // subnormal and underflow cases
+                            o_float32[`FLOAT32_EXPONENT_BITS] = 8'b0;
+                            if ((31 + scale_sum - 6) < 0) shifted_sum = (positive_sum[31:9]) >> (-1 * (31 + scale_sum - 6));
+                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6); //TODO
+                            o_float32[`FLOAT32_MANTISSA_BITS] = shifted_sum[31:9];
+                            if (shifted_sum[31:9] == 23'b0) o_underflow = 1;
+                            
+                        end 
                     end
                     32'b0000_0001_????_????_????_????_????_???? : begin
-                        o_float32[`FLOAT32_MANTISSA_BITS] = positive_sum_reg[23:1];
-                        scale_tmp = scale_sum_clamped + 8'd18;
-                        o_is_NaN = 1'b0;
+                        if (scale_sum - 6 + 24 > 0) begin
+                            if (scale_sum - 6 + 24 < 255) begin
+                                o_float32[`FLOAT32_MANTISSA_BITS] = positive_sum[23:1];
+                                o_float32[`FLOAT32_EXPONENT_BITS] = scale_sum + 8'd18;
+                            end
+                            else begin
+                                // overflow
+                                o_float32[`FLOAT32_MANTISSA_BITS] = {`FLOAT32_MANTISSA_WIDTH{1'b1}};
+                                o_float32[`FLOAT32_EXPONENT_BITS] = 8'b11111110;
+                                o_overflow = 1;
+                            end
+                        end
+                        else begin
+                            // subnormal and underflow cases
+                            o_float32[`FLOAT32_EXPONENT_BITS] = 8'b0;
+                            if ((31 + scale_sum - 6) < 0) shifted_sum = (positive_sum[31:9]) >> (-1 * (31 + scale_sum - 6));
+                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6); //TODO
+                            o_float32[`FLOAT32_MANTISSA_BITS] = shifted_sum[31:9];
+                            if (shifted_sum[31:9] == 23'b0) o_underflow = 1;
+                            
+                        end 
                     end
                     32'b0000_001?_????_????_????_????_????_???? : begin
-                        o_float32[`FLOAT32_MANTISSA_BITS] = positive_sum_reg[24:2];
-                        scale_tmp = scale_sum_clamped + 8'd19;
-                        o_is_NaN = 1'b0;
+                        if (scale_sum - 6 + 25 > 0) begin
+                            if (scale_sum - 6 + 25 < 255) begin
+                                o_float32[`FLOAT32_MANTISSA_BITS] = positive_sum[24:2];
+                                o_float32[`FLOAT32_EXPONENT_BITS] = scale_sum + 8'd19;
+                            end
+                            else begin
+                                // overflow
+                                o_float32[`FLOAT32_MANTISSA_BITS] = {`FLOAT32_MANTISSA_WIDTH{1'b1}};
+                                o_float32[`FLOAT32_EXPONENT_BITS] = 8'b11111110;
+                                o_overflow = 1;
+                            end
+                        end
+                        else begin
+                            // subnormal and underflow cases
+                            o_float32[`FLOAT32_EXPONENT_BITS] = 8'b0;
+                            if ((31 + scale_sum - 6) < 0) shifted_sum = (positive_sum[31:9]) >> (-1 * (31 + scale_sum - 6));
+                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6); //TODO
+                            o_float32[`FLOAT32_MANTISSA_BITS] = shifted_sum[31:9];
+                            if (shifted_sum[31:9] == 23'b0) o_underflow = 1;
+                            
+                        end 
                     end
                     32'b0000_01??_????_????_????_????_????_???? : begin
-                        o_float32[`FLOAT32_MANTISSA_BITS] = positive_sum_reg[25:3];
-                        scale_tmp = scale_sum_clamped + 8'd20;
-                        o_is_NaN = 1'b0;
+                        if (scale_sum - 6 + 26 > 0) begin
+                            if (scale_sum - 6 + 26 < 255) begin
+                                o_float32[`FLOAT32_MANTISSA_BITS] = positive_sum[25:3];
+                                o_float32[`FLOAT32_EXPONENT_BITS] = scale_sum + 8'd20;
+                            end
+                            else begin
+                                // overflow
+                                o_float32[`FLOAT32_MANTISSA_BITS] = {`FLOAT32_MANTISSA_WIDTH{1'b1}};
+                                o_float32[`FLOAT32_EXPONENT_BITS] = 8'b11111110;
+                                o_overflow = 1;
+                            end
+                        end
+                        else begin
+                            // subnormal and underflow cases
+                            o_float32[`FLOAT32_EXPONENT_BITS] = 8'b0;
+                            if ((31 + scale_sum - 6) < 0) shifted_sum = (positive_sum[31:9]) >> (-1 * (31 + scale_sum - 6));
+                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6); //TODO
+                            o_float32[`FLOAT32_MANTISSA_BITS] = shifted_sum[31:9];
+                            if (shifted_sum[31:9] == 23'b0) o_underflow = 1;
+                            
+                        end 
                     end
                     32'b0000_1???_????_????_????_????_????_???? : begin
-                        o_float32[`FLOAT32_MANTISSA_BITS] = positive_sum_reg[26:4];
-                        scale_tmp = scale_sum_clamped + 8'd17;
-                        o_is_NaN = 1'b0;
+                        if (scale_sum - 6 + 27 > 0) begin
+                            if (scale_sum - 6 + 27 < 255) begin
+                                o_float32[`FLOAT32_MANTISSA_BITS] = positive_sum[26:4];
+                                o_float32[`FLOAT32_EXPONENT_BITS] = scale_sum + 8'd21;
+                            end
+                            else begin
+                                // overflow
+                                o_float32[`FLOAT32_MANTISSA_BITS] = {`FLOAT32_MANTISSA_WIDTH{1'b1}};
+                                o_float32[`FLOAT32_EXPONENT_BITS] = 8'b11111110;
+                                o_overflow = 1;
+                            end
+                        end
+                        else begin
+                            // subnormal and underflow cases
+                            o_float32[`FLOAT32_EXPONENT_BITS] = 8'b0;
+                            if ((31 + scale_sum - 6) < 0) shifted_sum = (positive_sum[31:9]) >> (-1 * (31 + scale_sum - 6));
+                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6); //TODO
+                            o_float32[`FLOAT32_MANTISSA_BITS] = shifted_sum[31:9];
+                            if (shifted_sum[31:9] == 23'b0) o_underflow = 1;
+                            
+                        end 
                     end
                     32'b0001_????_????_????_????_????_????_???? : begin
-                        o_float32[`FLOAT32_MANTISSA_BITS] = positive_sum_reg[27:5];
-                        scale_tmp = scale_sum_clamped + 8'd18;
-                        o_is_NaN = 1'b0;
+                        if (scale_sum - 6 + 27 > 0) begin
+                            if (scale_sum - 6 + 27 < 255) begin
+                                o_float32[`FLOAT32_MANTISSA_BITS] = positive_sum[27:5];
+                                o_float32[`FLOAT32_EXPONENT_BITS] = scale_sum + 8'd22;
+                            end
+                            else begin
+                                // overflow
+                                o_float32[`FLOAT32_MANTISSA_BITS] = {`FLOAT32_MANTISSA_WIDTH{1'b1}};
+                                o_float32[`FLOAT32_EXPONENT_BITS] = 8'b11111110;
+                                o_overflow = 1;
+                            end
+                        end
+                        else begin
+                            // subnormal and underflow cases
+                            o_float32[`FLOAT32_EXPONENT_BITS] = 8'b0;
+                            if ((31 + scale_sum - 6) < 0) shifted_sum = (positive_sum[31:9]) >> (-1 * (31 + scale_sum - 6));
+                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6); //TODO
+                            o_float32[`FLOAT32_MANTISSA_BITS] = shifted_sum[31:9];
+                            if (shifted_sum[31:9] == 23'b0) o_underflow = 1;
+                            
+                        end 
                     end
                     32'b001?_????_????_????_????_????_????_???? : begin
-                        o_float32[`FLOAT32_MANTISSA_BITS] = positive_sum_reg[28:6];
-                        scale_tmp = scale_sum_clamped + 8'd19;
-                        o_is_NaN = 1'b0;
+                        if (scale_sum - 6 + 28 > 0) begin
+                            if (scale_sum - 6 + 28 < 255) begin
+                                o_float32[`FLOAT32_MANTISSA_BITS] = positive_sum[28:6];
+                                o_float32[`FLOAT32_EXPONENT_BITS] = scale_sum + 8'd23;
+                            end
+                            else begin
+                                // overflow
+                                o_float32[`FLOAT32_MANTISSA_BITS] = {`FLOAT32_MANTISSA_WIDTH{1'b1}};
+                                o_float32[`FLOAT32_EXPONENT_BITS] = 8'b11111110;
+                                o_overflow = 1;
+                            end
+                        end
+                        else begin
+                            // subnormal and underflow cases
+                            o_float32[`FLOAT32_EXPONENT_BITS] = 8'b0;
+                            if ((31 + scale_sum - 6) < 0) shifted_sum = (positive_sum[31:9]) >> (-1 * (31 + scale_sum - 6));
+                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6); //TODO
+                            o_float32[`FLOAT32_MANTISSA_BITS] = shifted_sum[31:9];
+                            if (shifted_sum[31:9] == 23'b0) o_underflow = 1;
+                            
+                        end 
                     end
                     32'b01??_????_????_????_????_????_????_???? : begin
-                        o_float32[`FLOAT32_MANTISSA_BITS] = positive_sum_reg[29:7];
-                        scale_tmp = scale_sum_clamped + 8'd20;
-                        o_is_NaN = 1'b0;
+                        if (scale_sum - 6 + 29 > 0) begin
+                            if (scale_sum - 6 + 29 < 255) begin
+                                o_float32[`FLOAT32_MANTISSA_BITS] = positive_sum[29:7];
+                                o_float32[`FLOAT32_EXPONENT_BITS] = scale_sum + 8'd24;
+                            end
+                            else begin
+                                // overflow
+                                o_float32[`FLOAT32_MANTISSA_BITS] = {`FLOAT32_MANTISSA_WIDTH{1'b1}};
+                                o_float32[`FLOAT32_EXPONENT_BITS] = 8'b11111110;
+                                o_overflow = 1;
+                            end
+                        end
+                        else begin
+                            // subnormal and underflow cases
+                            o_float32[`FLOAT32_EXPONENT_BITS] = 8'b0;
+                            if ((31 + scale_sum - 6) < 0) shifted_sum = (positive_sum[31:9]) >> (-1 * (31 + scale_sum - 6));
+                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6); //TODO
+                            o_float32[`FLOAT32_MANTISSA_BITS] = shifted_sum[31:9];
+                            if (shifted_sum[31:9] == 23'b0) o_underflow = 1;
+                            
+                        end 
                     end
                     32'b1???_????_????_????_????_????_????_???? : begin//
-                        o_float32[`FLOAT32_MANTISSA_BITS] = 23'b0;
-                        scale_tmp = 8'b11111111;
-                        o_is_NaN = 1'b1;
+                        if (scale_sum - 6 + 30 > 0) begin
+                            if (scale_sum - 6 + 30 < 255) begin
+                                o_float32[`FLOAT32_MANTISSA_BITS] = positive_sum[30:8];
+                                o_float32[`FLOAT32_EXPONENT_BITS] = scale_sum + 8'd25;
+                            end
+                            else begin
+                                // overflow
+                                o_float32[`FLOAT32_MANTISSA_BITS] = {`FLOAT32_MANTISSA_WIDTH{1'b1}};
+                                o_float32[`FLOAT32_EXPONENT_BITS] = 8'b11111110;
+                                o_overflow = 1;
+                            end
+                        end
+                        else begin
+                            // subnormal and underflow cases
+                            o_float32[`FLOAT32_EXPONENT_BITS] = 8'b0;
+                            if ((31 + scale_sum - 6) < 0) shifted_sum = (positive_sum[31:9]) >> (-1 * (31 + scale_sum - 6));
+                            else if ((31 + scale_sum - 6) > 0) shifted_sum = positive_sum << (31 + scale_sum - 6); //TODO
+                            o_float32[`FLOAT32_MANTISSA_BITS] = shifted_sum[31:9];
+                            if (shifted_sum[31:9] == 23'b0) o_underflow = 1;
+                            
+                        end 
                     end
                 endcase 
-                o_overflow = o_is_NaN ? 1'b0 : (scale_tmp > 8'b11111110);
-                if(o_overflow)begin
-                    o_float32[`FLOAT32_MANTISSA_BITS] = 23'b0;
-                    o_float32[`FLOAT32_EXPONENT_BITS] = 8'b11111111;
-                end
-                else begin
-                    o_float32[`FLOAT32_EXPONENT_BITS] = scale_tmp;
-                end
-            end
+                // o_overflow = o_is_NaN ? 1'b0 : (scale_tmp > 8'b11111110);
+                // if(o_overflow)begin
+                //     o_float32[`FLOAT32_MANTISSA_BITS] = 23'b0;
+                //     o_float32[`FLOAT32_EXPONENT_BITS] = 8'b11111110;
+                // end
+                // else begin
+                //     o_float32[`FLOAT32_EXPONENT_BITS] = scale_tmp;
+                // end
+            //end
         end
     end
 
